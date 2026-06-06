@@ -211,7 +211,8 @@
         .problem-content, .problem-content *, .markdown-body, .markdown-body *,
         .table, .btn, input:not([type="checkbox"]):not([type="radio"]), select,
         [class*="problem"], [class*="Problem"], [id*="problem"], [id*="Problem"],
-        .content, .article, .text, .description, .statement {
+        .content, .article, .text, .description, .statement,
+        .container, #description-container, #description-container * {
             font-family: var(--vjb-font-content, 'Google Sans') !important;
         }
         
