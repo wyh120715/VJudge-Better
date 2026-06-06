@@ -206,17 +206,12 @@
             font-family: var(--vjb-font-code, 'JetBrains Mono NL') !important;
         }
         
-        /* 题面及其他内容 (统一使用 content 字体) - 扩大选择范围 */
-        body, div, span, p, h1, h2, h3, h4, h5, h6, 
-        .problem-content, .problem-content *, .markdown-body, .markdown-body *,
-        .table, .btn, input:not([type="checkbox"]):not([type="radio"]), select,
-        [class*="problem"], [class*="Problem"], [id*="problem"], [id*="Problem"],
-        .content, .article, .text, .description, .statement,
-        .container, #description-container, #description-container * {
+        /* 全局其他内容 (统一使用 content 字体) - 排除代码区域 */
+        body * :not(pre):not(code):not(.ace_editor):not(.ace_editor *):not(textarea.monospace):not(.input-textarea):not([class*="code"]):not([class*="Code"]):not([id*="code"]):not([id*="Code"]):not(.source-code):not(.code-block):not(.editor-container) {
             font-family: var(--vjb-font-content, 'Google Sans') !important;
         }
         
-        /* 特殊排除：代码块内部不受 content 字体影响 (上面 pre/code 优先级更高) */
+        /* 特殊排除：确保代码块内部不受 content 字体影响 */
         
         /* --- 榜单美化 --- */
         .standings-table thead tr {
