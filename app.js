@@ -199,15 +199,19 @@
         }
 
         /* --- 字体应用 --- */
-        /* 代码区域 */
-        pre, code, .ace_editor, .ace_editor *, textarea.monospace, .input-textarea {
+        /* 代码区域 - 扩大选择范围 */
+        pre, code, .ace_editor, .ace_editor *, textarea.monospace, .input-textarea,
+        [class*="code"], [class*="Code"], [id*="code"], [id*="Code"],
+        .source-code, .code-block, .editor-container {
             font-family: var(--vjb-font-code, 'JetBrains Mono NL') !important;
         }
         
-        /* 题面及其他内容 (统一使用 content 字体) */
+        /* 题面及其他内容 (统一使用 content 字体) - 扩大选择范围 */
         body, div, span, p, h1, h2, h3, h4, h5, h6, 
-        .problem-content, .markdown-body, .table, .btn, 
-        input:not([type="checkbox"]):not([type="radio"]), select {
+        .problem-content, .problem-content *, .markdown-body, .markdown-body *,
+        .table, .btn, input:not([type="checkbox"]):not([type="radio"]), select,
+        [class*="problem"], [class*="Problem"], [id*="problem"], [id*="Problem"],
+        .content, .article, .text, .description, .statement {
             font-family: var(--vjb-font-content, 'Google Sans') !important;
         }
         

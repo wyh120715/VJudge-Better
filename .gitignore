@@ -1,3 +1,70 @@
+# Examples where the input contains only source/config files (no build artifacts, dependencies, or temp files):
+
+**Example 1:**
+
+Input:
+```
+### Added files:
+[src/main.py, README.md, config.json]
+
+### Deleted files:
+[old/unused.py]
+
+### Modified files:
+[utils.py]
+
+### Current .gitignore Content
+(empty)
+```
+
+Expected Output:
+```
+(empty — output nothing)
+```
+
+**Example 2:**
+
+Input:
+```
+### Added files:
+[app.js, styles.css, index.html]
+
+### Deleted files:
+[]
+
+### Modified files:
+[package.json]
+
+### Current .gitignore Content
+(node empty)
+```
+
+Expected Output:
+```
+(empty — output nothing)
+```
+
+---
+
+**Example 3 (Project with artifacts):**
+
+Input:
+```
+### Added files:
+[pycache/main.cpython-310.pyc, dist/app.js, .env.local, .vscode/settings.json]
+
+### Deleted files:
+[]
+
+### Modified files:
+[]
+
+### Current .gitignore Content
+*.log
+```
+
+Expected Output:
+```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
@@ -5,60 +72,48 @@ __pycache__/
 *.obj
 dist/
 build/
-target/
 
 # Dependencies
 .venv/
 venv/
 node_modules/
-.mypy_cache/
-.pytest_cache/
-.gradle/
 
 # Logs and temp files
 *.log
 *.tmp
 *.swp
-*.swo
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
 # Editors
 .vscode/
 .idea/
 
-# System files
-.DS_Store
-Thumbs.db
+# Original rules preserved
+*.log
+```
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
+---
 
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+Input:
+```
+### Added files:
+[]
+
+### Deleted files:
+[]
+
+### Modified files:
+['app.js']
+
+### Current .gitignore Content
+
+```
+
+Expected Output:
+```
+(empty — output nothing)
+```
