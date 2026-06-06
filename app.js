@@ -59,9 +59,13 @@
 
     // ================= 样式注入 =================
     const styles = `
-        /* --- 全局平滑过渡 --- */
+        /* --- 全局平滑过渡 (排除背景和滑块) --- */
         body, div, span, a, button, input, table, tr, td, th, li, ul, .nav-slider {
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        }
+        /* 排除背景容器和滑块，避免异常动画 */
+        #vjb-bg-container, #vjb-bg-image, #vjb-bg-video, .vjb-nav-slider {
+            transition: none !important;
         }
 
         /* --- 背景层 --- */
@@ -171,15 +175,15 @@
         
         /* 滑动块样式 */
         .vjb-nav-slider {
-            position: absolute;
-            bottom: 0;
+            position: fixed;
             height: 3px;
             background: var(--vjb-theme, #4a90e2);
             border-radius: 3px 3px 0 0;
             pointer-events: none;
-            transition: left 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), width 0.3s ease;
+            transition: left 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), width 0.3s ease, top 0.3s ease;
             opacity: 0.8;
             box-shadow: 0 0 10px var(--vjb-theme, #4a90e2);
+            z-index: 9997;
         }
 
         /* 强制链接相对定位以便计算 */
@@ -207,11 +211,18 @@
         }
         
         /* 全局其他内容 (统一使用 content 字体) - 排除代码区域 */
-        body * :not(pre):not(code):not(.ace_editor):not(.ace_editor *):not(textarea.monospace):not(.input-textarea):not([class*="code"]):not([class*="Code"]):not([id*="code"]):not([id*="Code"]):not(.source-code):not(.code-block):not(.editor-container) {
-            font-family: var(--vjb-font-content, 'Google Sans') !important;
+        /* 使用更通用的选择器，确保覆盖嵌套内容 */
+        body, .container, #description-container, .problem-content, .markdown-body,
+        [class*="problem"], [id*="problem"], .content, .article, .text, .description, .statement,
+        table, td, th, li, ul, ol, p, span, div, a, button, input:not(.ace_text-input), select, label,
+        h1, h2, h3, h4, h5, h6, strong, em, b, i, u {
+            font-family: var(--vjb-font-content, 'Google Sans'), sans-serif !important;
         }
         
         /* 特殊排除：确保代码块内部不受 content 字体影响 */
+        pre *, code *, .ace_editor *, [class*="code"] *, [id*="code"] *, .source-code *, .code-block * {
+            font-family: var(--vjb-font-code, 'JetBrains Mono NL') !important;
+        }
         
         /* --- 榜单美化 --- */
         .standings-table thead tr {
@@ -255,8 +266,12 @@
         root.style.setProperty('--vjb-font-content', settings.fontContent);
         root.style.setProperty('--vjb-theme', settings.themeColor);
 
-        // 背景处理
-        const container = document.getElementById('vjb-bg-container');
+        // 背景处理 - 每次应用时确保背景存在
+        let container = document.getElementById('vjb-bg-container');
+        if (!container) {
+            initBackground();
+            container = document.getElementById('vjb-bg-container');
+        }
         if (!container) return;
 
         if (settings.bgImage) {
@@ -538,20 +553,15 @@
         function moveSlider(target) {
             if (!target) return;
             const rect = target.getBoundingClientRect();
-            const parentRect = target.parentElement.getBoundingClientRect(); // 相对于父级
             
-            // 计算相对于视口的位置，然后减去父级偏移？ 
-            // 更简单的方法：直接算 absolute 相对于 document 或者 offsetParent
-            // 这里我们假设 slider 是 body 的子元素，所以需要计算相对于 body 的位置
-            
-            const bodyRect = document.body.getBoundingClientRect();
-            const left = rect.left - bodyRect.left;
+            // 使用 fixed 定位，直接相对于视口计算位置
+            const left = rect.left;
             const width = rect.width;
-            const top = rect.bottom - bodyRect.top; // 底部对齐
+            const top = rect.bottom - 3; // 底部对齐，减去滑块高度
 
             slider.style.width = `${width}px`;
             slider.style.left = `${left}px`;
-            slider.style.top = `${top - 3}px`; // 3px is slider height
+            slider.style.top = `${top}px`;
         }
 
         function attachListeners() {
