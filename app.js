@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         VJudgeBetter
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  VJudge 美化增强脚本 - 支持字体切换、背景设置、界面美化
 // @author       VJudgeBetter Team
 // @match        https://vjudge.net/*
 // @match        https://cn.vjudge.net/*
+// @exclude      *iframe*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_listValues
@@ -20,6 +21,14 @@
 
 (function() {
     'use strict';
+
+    // 【关键修复】确保只在主框架运行，防止在题面 iframe 中重复执行
+    if (window.top !== window.self) {
+        console.log('[VJudgeBetter] Skipping execution in iframe');
+        return;
+    }
+
+    console.log('[VJudgeBetter] Initializing in main frame only');
 
     // ==================== 配置管理 ====================
     const CONFIG = {
