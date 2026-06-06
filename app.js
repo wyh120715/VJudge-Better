@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VJudgeBetter
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      2.0
 // @description  VJudge 美化增强脚本 - 支持字体切换、背景设置、界面美化
 // @author       VJudgeBetter Team
 // @match        https://vjudge.net/*
@@ -32,22 +32,57 @@
         supportedVideoFormats: ['.mp4', '.webm']
     };
 
-    // ==================== 字体检测 ====================
-    function detectAvailableFonts() {
-        const commonFonts = [
-            'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI',
-            'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif',
-            'SimSun', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB',
-            'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'Source Han Sans CN',
-            'FangSong', 'KaiTi', 'STHeiti', 'STSong', 'STKaiti', 'STFangsong',
-            'Courier New', 'Consolas', 'Monaco', 'monospace',
-            'Times New Roman', 'Georgia', 'Palatino', 'serif',
-            'Impact', 'Arial Black', 'Comic Sans MS', 'cursive',
-            'Verdana', 'Tahoma', 'Trebuchet MS', 'Lucida Sans',
-            'Franklin Gothic Medium', 'Gill Sans', 'Optima',
-            'Futura', 'Century Gothic', 'Avant Garde'
-        ];
+    // ==================== 字体列表（分类） ====================
+    const FONT_CATEGORIES = {
+        code: {
+            name: '代码字体',
+            fonts: [
+                'Consolas', 'Courier New', 'Courier', 'Monaco', 'monospace',
+                'Menlo', 'Lucida Console', 'Andale Mono', 'DejaVu Sans Mono',
+                'Fira Code', 'Source Code Pro', 'JetBrains Mono', 'JetBrains Mono NL',
+                'Hack', 'Inconsolata', 'Roboto Mono', 'Ubuntu Mono', 'Droid Sans Mono',
+                'PT Mono', 'Anonymous Pro', 'Envy Code R', 'PragmataPro',
+                'Input Mono', 'Cascadia Code', 'IBM Plex Mono', 'Overpass Mono',
+                'Fira Mono', 'SFMono-Regular', 'JetBrains Mono NF', 'Cascadia Mono'
+            ]
+        },
+        problem: {
+            name: '题面字体',
+            fonts: [
+                'Georgia', 'Times New Roman', 'Palatino', 'Palatino Linotype',
+                'Book Antiqua', 'Garamond', 'Baskerville', 'Didot', 'Hoefler Text',
+                'Cambria', 'Constantia', 'serif', 'Merriweather', 'Playfair Display',
+                'Lora', 'PT Serif', 'Source Serif Pro', 'Libre Baskerville',
+                'Crimson Text', 'EB Garamond', 'Cormorant Garamond', 'Vollkorn',
+                'Cardo', 'Gentium Plus', 'Linux Libertine O', 'Charis SIL'
+            ]
+        },
+        other: {
+            name: '其他内容字体',
+            fonts: [
+                'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI',
+                'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif',
+                'Verdana', 'Tahoma', 'Trebuchet MS', 'Lucida Sans', 'Lucida Grande',
+                'Franklin Gothic Medium', 'Gill Sans', 'Optima', 'Futura',
+                'Century Gothic', 'Avant Garde', 'Myriad Pro', 'Myriad Set Pro',
+                'Proxima Nova', 'Open Sans', 'Lato', 'Montserrat', 'Raleway',
+                'Poppins', 'Nunito', 'Quicksand', 'Oswald', 'Merriweather Sans',
+                'Work Sans', 'Inter', 'DM Sans', 'IBM Plex Sans', 'Fira Sans',
+                'Source Sans Pro', 'PT Sans', 'Ubuntu', 'Cantarell', 'Droid Sans',
+                'Google Sans', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB',
+                'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'Source Han Sans CN',
+                'Heiti SC', 'STHeiti', 'SimSun', 'Microsoft JhengHei', 'MingLiU',
+                'PMingLiU', 'DFKai-SB', 'KaiTi', 'FangSong', 'Meiryo', 'Yu Gothic',
+                'Malgun Gothic', 'Nanum Gothic', 'Segoe UI Emoji', 'Apple Color Emoji',
+                'Noto Color Emoji', 'Impact', 'Arial Black', 'Comic Sans MS',
+                'Pacifico', 'Dancing Script', 'Lobster', 'Great Vibes'
+            ]
+        }
+    };
 
+    // ==================== 字体检测 ====================
+    function detectAvailableFonts(category) {
+        const fonts = FONT_CATEGORIES[category]?.fonts || [];
         const detectedFonts = [];
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -61,16 +96,12 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
-        const baseWidths = {};
-
-        commonFonts.forEach(font => {
+        fonts.forEach(font => {
             ctx.font = `${fontSize}px "${font}"`;
             const metrics = ctx.measureText(testText);
             const textWidth = metrics.width;
 
-            // 检查字体是否可用（通过测量文本宽度）
             if (textWidth > 0) {
-                // 避免重复添加相似字体
                 const fontName = font.replace(/['"]/g, '');
                 if (!detectedFonts.includes(fontName)) {
                     detectedFonts.push(fontName);
@@ -78,9 +109,8 @@
             }
         });
 
-        // 如果检测失败，返回常见字体列表
-        if (detectedFonts.length < 5) {
-            return commonFonts.slice(0, 20);
+        if (detectedFonts.length < 3) {
+            return fonts.slice(0, 15);
         }
 
         return detectedFonts;
@@ -89,9 +119,23 @@
     // ==================== 样式注入 ====================
     function injectStyles() {
         const styles = `
-            /* 全局字体设置 */
-            body, .container-fluid, .navbar, .btn, input, select, textarea {
-                font-family: var(--vjb-font-family, system-ui) !important;
+            /* 全局字体设置 - 分类控制 */
+            body, .container-fluid, .navbar, .btn, input:not(.code-input), select:not(.code-input), textarea:not(.code-input) {
+                font-family: var(--vjb-font-other, system-ui) !important;
+            }
+
+            /* 代码区域字体 */
+            pre, code, .CodeMirror, .ace_editor, textarea.code-input, .code-input, 
+            .form-control.code, .problem-code, .submit-code, .editor-container,
+            .ace-content, .cm-content, .monaco-editor {
+                font-family: var(--vjb-font-code, Consolas, monospace) !important;
+            }
+
+            /* 题面区域字体 */
+            .problem-statement, .problem-description, .problem-content, 
+            .statement-body, .markdown-body, .problem-text, .rich-text,
+            .mathjax, .katex, .equation {
+                font-family: var(--vjb-font-problem, Georgia, serif) !important;
             }
 
             /* 背景容器 */
@@ -243,9 +287,9 @@
                 padding: 30px;
                 z-index: 100000;
                 box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-                max-width: 600px;
+                max-width: 650px;
                 width: 90%;
-                max-height: 80vh;
+                max-height: 85vh;
                 overflow-y: auto;
                 display: none;
             }
@@ -273,8 +317,15 @@
                 padding-bottom: 10px;
             }
 
+            #vjb-settings-panel h3 {
+                color: #333;
+                margin-top: 20px;
+                margin-bottom: 10px;
+                font-size: 16px;
+            }
+
             #vjb-settings-panel .setting-group {
-                margin-bottom: 20px;
+                margin-bottom: 15px;
             }
 
             #vjb-settings-panel label {
@@ -340,6 +391,37 @@
                 display: block;
             }
 
+            /* 浮动按钮样式 */
+            #vjb-float-btn {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border: none;
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+                cursor: pointer;
+                z-index: 99997;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+                padding: 0;
+            }
+
+            #vjb-float-btn:hover {
+                transform: scale(1.1) rotate(30deg);
+                box-shadow: 0 6px 25px rgba(102, 126, 234, 0.7);
+            }
+
+            #vjb-float-btn svg {
+                width: 28px;
+                height: 28px;
+                fill: white;
+            }
+
             /* 快捷键提示 */
             #vjb-shortcut-hint {
                 position: fixed;
@@ -373,12 +455,9 @@
         }
 
         init() {
-            // 创建背景容器
             this.container = document.createElement('div');
             this.container.id = 'vjb-background-container';
             document.documentElement.appendChild(this.container);
-
-            // 加载保存的背景
             this.loadBackground();
         }
 
@@ -399,13 +478,11 @@
         }
 
         setImageBackground(dataUrl, filename) {
-            // 移除视频元素
             if (this.videoElement) {
                 this.videoElement.remove();
                 this.videoElement = null;
             }
 
-            // 创建或更新图片元素
             if (!this.imageElement) {
                 this.imageElement = document.createElement('img');
                 this.imageElement.id = 'vjb-background-image';
@@ -417,13 +494,11 @@
         }
 
         setVideoBackground(dataUrl, filename) {
-            // 移除图片元素
             if (this.imageElement) {
                 this.imageElement.remove();
                 this.imageElement = null;
             }
 
-            // 创建或更新视频元素
             if (!this.videoElement) {
                 this.videoElement = document.createElement('video');
                 this.videoElement.id = 'vjb-background-video';
@@ -453,16 +528,6 @@
             GM_deleteValue(CONFIG.storagePrefix + 'bgType');
         }
 
-        isValidFile(filename) {
-            const ext = '.' + filename.split('.').pop().toLowerCase();
-            const allSupported = [
-                ...CONFIG.supportedImageFormats,
-                ...CONFIG.supportedAnimatedFormats,
-                ...CONFIG.supportedVideoFormats
-            ];
-            return allSupported.includes(ext);
-        }
-
         getFileType(filename) {
             const ext = '.' + filename.split('.').pop().toLowerCase();
             if (CONFIG.supportedVideoFormats.includes(ext)) {
@@ -475,41 +540,43 @@
     // ==================== 字体管理 ====================
     class FontManager {
         constructor() {
-            this.availableFonts = [];
             this.init();
         }
 
         async init() {
-            // 检测可用字体
-            this.availableFonts = detectAvailableFonts();
-
-            // 加载保存的字体设置
-            const savedFont = GM_getValue(CONFIG.storagePrefix + 'font', CONFIG.defaultFont);
-            this.setFont(savedFont);
+            this.loadFonts();
         }
 
-        setFont(fontName) {
-            document.documentElement.style.setProperty('--vjb-font-family', fontName);
-            GM_setValue(CONFIG.storagePrefix + 'font', fontName);
+        loadFonts() {
+            const codeFont = GM_getValue(CONFIG.storagePrefix + 'fontCode', 'Consolas');
+            const problemFont = GM_getValue(CONFIG.storagePrefix + 'fontProblem', 'Georgia');
+            const otherFont = GM_getValue(CONFIG.storagePrefix + 'fontOther', 'system-ui');
+
+            this.setFont('code', codeFont);
+            this.setFont('problem', problemFont);
+            this.setFont('other', otherFont);
         }
 
-        getAvailableFonts() {
-            return this.availableFonts;
+        setFont(category, fontName) {
+            const cssVar = `--vjb-font-${category}`;
+            document.documentElement.style.setProperty(cssVar, fontName);
+            GM_setValue(CONFIG.storagePrefix + `font${category.charAt(0).toUpperCase() + category.slice(1)}`, fontName);
+        }
+
+        getAvailableFonts(category) {
+            return detectAvailableFonts(category);
         }
     }
 
     // ==================== 界面美化 ====================
-    class UIMenhancer {
+    class UIEnhancer {
         constructor() {
             this.observer = null;
             this.init();
         }
 
         init() {
-            // 监听 DOM 变化以应用美化
             this.setupObserver();
-
-            // 立即应用美化
             setTimeout(() => this.applyEnhancements(), 500);
         }
 
@@ -527,23 +594,23 @@
                 }
             });
 
-            this.observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
+            if (document.body) {
+                this.observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
         }
 
         applyEnhancements() {
             const url = window.location.href;
 
-            // 提交界面美化
             if (url.includes('/submit') || url.includes('/problem')) {
                 document.querySelectorAll('.form-horizontal, .panel-default').forEach(el => {
                     el.closest('.container')?.classList.add('vjb-submit-page');
                 });
             }
 
-            // 比赛榜单美化
             if (url.includes('/contest') && (url.includes('/standing') || url.includes('/rank'))) {
                 document.querySelectorAll('.standings, .table-responsive').forEach(el => {
                     el.classList.add('vjb-contest-standings');
@@ -556,7 +623,6 @@
             const table = container.querySelector('table');
             if (!table) return;
 
-            // 处理单元格状态
             table.querySelectorAll('td').forEach(td => {
                 const text = td.textContent.trim().toLowerCase();
 
@@ -573,9 +639,8 @@
                 }
             });
 
-            // 处理奖牌
             table.querySelectorAll('tr').forEach((tr, index) => {
-                if (index === 0) return; // 跳过表头
+                if (index === 0) return;
 
                 const rankCell = tr.querySelector('td:first-child');
                 if (!rankCell) return;
@@ -600,10 +665,12 @@
             this.panel = null;
             this.overlay = null;
             this.hint = null;
+            this.floatBtn = null;
             this.init();
         }
 
         init() {
+            this.createFloatButton();
             this.createPanel();
             this.createOverlay();
             this.createShortcutHint();
@@ -611,26 +678,62 @@
             this.registerMenuCommands();
         }
 
+        createFloatButton() {
+            this.floatBtn = document.createElement('button');
+            this.floatBtn.id = 'vjb-float-btn';
+            this.floatBtn.title = 'VJudgeBetter 设置';
+            this.floatBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+            `;
+            document.body.appendChild(this.floatBtn);
+        }
+
         createPanel() {
             this.panel = document.createElement('div');
             this.panel.id = 'vjb-settings-panel';
 
-            const fonts = this.fontManager.getAvailableFonts();
-            const currentFont = GM_getValue(CONFIG.storagePrefix + 'font', CONFIG.defaultFont);
+            const codeFonts = this.fontManager.getAvailableFonts('code');
+            const problemFonts = this.fontManager.getAvailableFonts('problem');
+            const otherFonts = this.fontManager.getAvailableFonts('other');
+
+            const currentCodeFont = GM_getValue(CONFIG.storagePrefix + 'fontCode', 'Consolas');
+            const currentProblemFont = GM_getValue(CONFIG.storagePrefix + 'fontProblem', 'Georgia');
+            const currentOtherFont = GM_getValue(CONFIG.storagePrefix + 'fontOther', 'system-ui');
             const currentOpacity = GM_getValue(CONFIG.storagePrefix + 'bgOpacity', CONFIG.defaultBgOpacity);
 
             this.panel.innerHTML = `
                 <h2>🎨 VJudgeBetter 设置</h2>
 
+                <h3>⌨️ 代码字体</h3>
                 <div class="setting-group">
-                    <label for="vjb-font-select">选择字体</label>
-                    <select id="vjb-font-select">
-                        ${fonts.map(font =>
-                            `<option value="${font}" ${font === currentFont ? 'selected' : ''}>${font}</option>`
+                    <select id="vjb-font-code">
+                        ${codeFonts.map(font =>
+                            `<option value="${font}" ${font === currentCodeFont ? 'selected' : ''}>${font}</option>`
                         ).join('')}
                     </select>
                 </div>
 
+                <h3>📖 题面字体</h3>
+                <div class="setting-group">
+                    <select id="vjb-font-problem">
+                        ${problemFonts.map(font =>
+                            `<option value="${font}" ${font === currentProblemFont ? 'selected' : ''}>${font}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+
+                <h3>🌐 其他内容字体</h3>
+                <div class="setting-group">
+                    <select id="vjb-font-other">
+                        ${otherFonts.map(font =>
+                            `<option value="${font}" ${font === currentOtherFont ? 'selected' : ''}>${font}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+
+                <h3>🖼️ 背景设置</h3>
                 <div class="setting-group">
                     <label for="vjb-bg-file">上传背景图片/视频</label>
                     <input type="file" id="vjb-bg-file" accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm">
@@ -679,22 +782,36 @@
         createShortcutHint() {
             this.hint = document.createElement('div');
             this.hint.id = 'vjb-shortcut-hint';
-            this.hint.textContent = '⌨️ 按 Alt+S 打开设置';
+            this.hint.textContent = '⌨️ 按 Alt+S 或点击右下角齿轮打开设置';
             document.body.appendChild(this.hint);
 
-            // 显示提示
             setTimeout(() => {
                 this.hint.classList.add('show');
                 setTimeout(() => {
                     this.hint.classList.remove('show');
-                }, 3000);
-            }, 2000);
+                }, 4000);
+            }, 1500);
         }
 
         bindEvents() {
-            // 字体选择
-            this.panel.querySelector('#vjb-font-select').addEventListener('change', (e) => {
-                this.fontManager.setFont(e.target.value);
+            // 浮动按钮点击
+            this.floatBtn.addEventListener('click', () => {
+                this.toggle();
+            });
+
+            // 字体选择 - 代码字体
+            this.panel.querySelector('#vjb-font-code').addEventListener('change', (e) => {
+                this.fontManager.setFont('code', e.target.value);
+            });
+
+            // 字体选择 - 题面字体
+            this.panel.querySelector('#vjb-font-problem').addEventListener('change', (e) => {
+                this.fontManager.setFont('problem', e.target.value);
+            });
+
+            // 字体选择 - 其他内容字体
+            this.panel.querySelector('#vjb-font-other').addEventListener('change', (e) => {
+                this.fontManager.setFont('other', e.target.value);
             });
 
             // 背景文件上传
@@ -707,7 +824,6 @@
 
                 const ext = '.' + file.name.split('.').pop().toLowerCase();
 
-                // 检查文件格式
                 if (ext === '.gif' && !enableGif) {
                     alert('GIF 背景未启用，请在设置中勾选"启用 GIF 背景支持"');
                     e.target.value = '';
@@ -734,7 +850,6 @@
                     return;
                 }
 
-                // 读取文件
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const dataUrl = event.target.result;
@@ -837,7 +952,6 @@
 
     // ==================== 初始化 ====================
     function init() {
-        // 等待页面加载
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', start);
         } else {
@@ -845,19 +959,16 @@
         }
 
         function start() {
-            // 注入样式
             injectStyles();
 
-            // 初始化各模块
             const backgroundManager = new BackgroundManager();
             const fontManager = new FontManager();
-            const uiEnhancer = new UIMenhancer();
+            const uiEnhancer = new UIEnhancer();
             const settingsPanel = new SettingsPanel(backgroundManager, fontManager);
 
-            console.log('✅ VJudgeBetter 已启动！按 Alt+S 打开设置面板');
+            console.log('✅ VJudgeBetter v2.0 已启动！按 Alt+S 或点击右下角齿轮图标打开设置面板');
         }
     }
 
-    // 启动脚本
     init();
 })();
