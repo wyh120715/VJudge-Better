@@ -148,10 +148,10 @@
         .vjb-select, .vjb-input {
             width: 100%;
             padding: 8px 12px;
-            background: rgba(255,255,255,0.1);
+            background: #fff;
             border: 1px solid rgba(255,255,255,0.2);
             border-radius: 6px;
-            color: #fff;
+            color: #333;
             font-family: inherit;
             outline: none;
         }
@@ -346,9 +346,21 @@
             </div>
 
             <div class="vjb-group">
-                <label class="vjb-label">背景图片/视频 URL (.jpg, .png, .gif, .mp4)</label>
-                <input type="text" id="vjb-set-bg" class="vjb-input" value="${settings.bgImage}" placeholder="输入图片链接...">
-                <div style="margin-top:5px; display:flex; gap:10px;">
+                <label class="vjb-label">背景图片/视频 (拖拽或点击上传)</label>
+                <div id="vjb-drop-zone" style="border: 2px dashed rgba(255,255,255,0.3); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                    <div id="vjb-drop-text" style="color: #aaa; font-size: 14px;">
+                        <svg style="width: 40px; height: 40px; fill: #aaa; margin-bottom: 10px;" viewBox="0 0 24 24">
+                            <path d="M19.35,10.04C18.67,6.59,15.64,4,12,4C9.11,4,6.6,5.64,5.35,8.04C2.34,8.36,0,10.91,0,14c0,3.31,2.69,6,6,6h13 c2.76,0,5-2.24,5-5C24,12.36,21.95,10.22,19.35,10.04z M14,13v4h-4v-4H7l5-5l5,5H14z"/>
+                        </svg>
+                        <br>
+                        拖拽图片/视频到此处，或点击选择文件
+                        <br>
+                        <span style="font-size: 12px; color: #666;">支持 .jpg, .png, .gif, .mp4</span>
+                    </div>
+                    <input type="file" id="vjb-file-input" accept="image/*,video/mp4" style="display: none;">
+                    <div id="vjb-file-info" style="margin-top: 10px; font-size: 13px; color: #4a90e2; display: none;"></div>
+                </div>
+                <div style="margin-top:10px; display:flex; gap:10px;">
                     <label><input type="radio" name="bgType" value="image" ${settings.bgType === 'image' ? 'checked' : ''}> 图片/GIF</label>
                     <label><input type="radio" name="bgType" value="video" ${settings.bgType === 'video' ? 'checked' : ''}> 视频</label>
                     <button id="vjb-clear-bg" style="background:none; border:1px solid #666; color:#aaa; padding:2px 8px; border-radius:4px; cursor:pointer;">清除背景</button>
@@ -362,20 +374,102 @@
 
         document.body.appendChild(panel);
 
+        // 拖拽上传相关变量
+        let selectedFileData = settings.bgImage; // 存储当前选择的文件 base64 数据
+
+        // 显示已选择的文件信息
+        function showFileInfo(fileName) {
+            const fileInfo = document.getElementById('vjb-file-info');
+            const dropText = document.getElementById('vjb-drop-text');
+            if (fileInfo && dropText) {
+                dropText.style.display = 'none';
+                fileInfo.style.display = 'block';
+                fileInfo.innerHTML = `✓ 已选择：${fileName}`;
+            }
+        }
+
+        // 重置显示
+        function resetDropZone() {
+            const fileInfo = document.getElementById('vjb-file-info');
+            const dropText = document.getElementById('vjb-drop-text');
+            if (fileInfo && dropText) {
+                dropText.style.display = 'block';
+                fileInfo.style.display = 'none';
+                fileInfo.innerHTML = '';
+            }
+        }
+
+        // 处理文件选择
+        function handleFileSelect(file) {
+            if (!file) return;
+            
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4'];
+            if (!validTypes.includes(file.type)) {
+                alert('不支持的文件格式！请选择 .jpg, .png, .gif 或 .mp4 文件。');
+                return;
+            }
+
+            const maxSize = file.type.startsWith('video/') ? 20 * 1024 * 1024 : 5 * 1024 * 1024; // 视频 20MB, 图片 5MB
+            if (file.size > maxSize) {
+                alert(`文件过大！${file.type.startsWith('video/') ? '视频' : '图片'}大小不能超过 ${maxSize / 1024 / 1024}MB`);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                selectedFileData = e.target.result;
+                showFileInfo(file.name);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 拖拽区域事件
+        const dropZone = document.getElementById('vjb-drop-zone');
+        const fileInput = document.getElementById('vjb-file-input');
+
+        dropZone.onclick = () => fileInput.click();
+
+        fileInput.onchange = (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        };
+
+        dropZone.ondragover = (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#4a90e2';
+            dropZone.style.background = 'rgba(74,144,226,0.1)';
+        };
+
+        dropZone.ondragleave = () => {
+            dropZone.style.borderColor = 'rgba(255,255,255,0.3)';
+            dropZone.style.background = 'transparent';
+        };
+
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'rgba(255,255,255,0.3)';
+            dropZone.style.background = 'transparent';
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        };
+
         // 事件绑定
         document.getElementById('vjb-set-opacity').oninput = (e) => {
             document.getElementById('vjb-op-val').innerText = Math.round(e.target.value * 100) + '%';
         };
 
         document.getElementById('vjb-clear-bg').onclick = () => {
-            document.getElementById('vjb-set-bg').value = '';
+            selectedFileData = '';
+            resetDropZone();
         };
 
         document.getElementById('vjb-save-btn').onclick = () => {
             settings.fontCode = document.getElementById('vjb-set-font-code').value;
             settings.fontContent = document.getElementById('vjb-set-font-content').value;
             settings.opacity = parseFloat(document.getElementById('vjb-set-opacity').value);
-            settings.bgImage = document.getElementById('vjb-set-bg').value.trim();
+            settings.bgImage = selectedFileData;
             
             const bgRadios = document.getElementsByName('bgType');
             for(let r of bgRadios) {
@@ -398,10 +492,35 @@
             document.getElementById('vjb-set-font-content').value = settings.fontContent;
             document.getElementById('vjb-set-opacity').value = settings.opacity;
             document.getElementById('vjb-op-val').innerText = Math.round(settings.opacity * 100) + '%';
-            document.getElementById('vjb-set-bg').value = settings.bgImage;
+            
             const radios = document.getElementsByName('bgType');
             for(let r of radios) {
                 if(r.value === settings.bgType) r.checked = true;
+            }
+            
+            // 恢复文件信息显示
+            if (settings.bgImage) {
+                const fileInfo = document.getElementById('vjb-file-info');
+                const dropText = document.getElementById('vjb-drop-text');
+                if (fileInfo && dropText) {
+                    dropText.style.display = 'none';
+                    fileInfo.style.display = 'block';
+                    // 尝试从 base64 提取文件名或显示通用名称
+                    let displayName = '已选择的背景文件';
+                    if (settings.bgImage.includes('image/')) {
+                        displayName = '已选择：图片文件';
+                    } else if (settings.bgImage.includes('video/')) {
+                        displayName = '已选择：视频文件';
+                    }
+                    fileInfo.innerHTML = `✓ ${displayName}`;
+                }
+            } else {
+                const fileInfo = document.getElementById('vjb-file-info');
+                const dropText = document.getElementById('vjb-drop-text');
+                if (fileInfo && dropText) {
+                    dropText.style.display = 'block';
+                    fileInfo.style.display = 'none';
+                }
             }
         }
     }
