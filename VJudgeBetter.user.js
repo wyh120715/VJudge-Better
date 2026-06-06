@@ -440,15 +440,19 @@
 
             <div style="margin-bottom: 24px;">
                 <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">📝 字体选择</label>
-                <select id="vjb-font" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                <select id="vjb-font" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff;">
                     ${fontOptions}
                 </select>
             </div>
 
             <div style="margin-bottom: 24px;">
                 <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">🖼️ 背景图片</label>
-                <input type="file" id="vjb-bg-file" accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;"/>
-                <small style="color: #666; display: block; margin-top: 6px;">支持格式：JPG, PNG, WebP, GIF (可选), MP4/WebM (可选)</small>
+                <div id="vjb-bg-dropzone" style="width: 100%; padding: 30px; border: 2px dashed #e0e0e0; border-radius: 8px; text-align: center; background: #fafafa; transition: all 0.3s ease; cursor: pointer;">
+                    <div style="font-size: 48px; color: #ccc; margin-bottom: 10px;">📁</div>
+                    <div style="color: #666;">点击或拖拽图片到此处上传</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 8px;">支持格式：JPG, PNG, WebP, GIF, MP4/WebM</div>
+                    <input type="file" id="vjb-bg-file" accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm" style="display: none;"/>
+                </div>
                 ${CONFIG.backgroundImage ? `<div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 12px; color: #666;">当前已设置背景</span>
                     <button id="vjb-remove-bg" style="background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">移除背景</button>
@@ -506,6 +510,65 @@
             document.getElementById('vjb-opacity-value').textContent = Math.round(e.target.value * 100) + '%';
         });
 
+        // 拖拽上传功能
+        const dropzone = document.getElementById('vjb-bg-dropzone');
+        const fileInput = document.getElementById('vjb-bg-file');
+
+        // 点击触发文件选择
+        dropzone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 文件选择变化
+        fileInput.addEventListener('change', (e) => {
+            handleFileSelect(e.target.files[0]);
+        });
+
+        // 拖拽进入
+        dropzone.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = '#667eea';
+            dropzone.style.background = '#f0f4ff';
+        });
+
+        // 拖拽离开
+        dropzone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = '#e0e0e0';
+            dropzone.style.background = '#fafafa';
+        });
+
+        // 拖拽中
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        // 拖拽放下
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = '#e0e0e0';
+            dropzone.style.background = '#fafafa';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (!file) return;
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm'];
+            if (!validTypes.some(type => file.type.includes(type.split('/')[1]))) {
+                alert('不支持的文件格式，请选择图片（JPG/PNG/WebP/GIF）或视频（MP4/WebM）文件');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                GM_setValue('backgroundImage', e.target.result);
+                location.reload();
+            };
+            reader.readAsDataURL(file);
+        }
+
         document.getElementById('vjb-save').addEventListener('click', saveSettings);
 
         if (document.getElementById('vjb-remove-bg')) {
@@ -533,18 +596,7 @@
             GM_setValue('enableGif', newEnableGif);
             GM_setValue('enableVideo', newEnableVideo);
 
-            const fileInput = document.getElementById('vjb-bg-file');
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    GM_setValue('backgroundImage', e.target.result);
-                    location.reload();
-                };
-                reader.readAsDataURL(file);
-            } else {
-                location.reload();
-            }
+            location.reload();
         }
     }
 
