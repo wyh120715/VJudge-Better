@@ -185,10 +185,22 @@
             background: var(--vjb-theme, #4a90e2);
             border-radius: 3px 3px 0 0;
             pointer-events: none;
-            transition: left 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), width 0.3s ease, top 0.3s ease;
+            transition: left 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), width 0.3s ease, top 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
             opacity: 0.8;
             box-shadow: 0 0 10px var(--vjb-theme, #4a90e2);
             z-index: 9997;
+        }
+        
+        /* 深色主题下的悬停颜色 */
+        .vjb-nav-slider.hover-dark {
+            background: #1a5fb4 !important;
+            box-shadow: 0 0 10px #1a5fb4 !important;
+        }
+        
+        /* 浅色主题下的悬停颜色 */
+        .vjb-nav-slider.hover-light {
+            background: #64baff !important;
+            box-shadow: 0 0 10px #64baff !important;
         }
 
         /* 强制链接相对定位以便计算 */
@@ -578,6 +590,46 @@
             slider.style.width = `${width}px`;
             slider.style.left = `${left}px`;
             slider.style.top = `${top}px`;
+            
+            // 根据主题设置悬停颜色
+            slider.classList.remove('hover-dark', 'hover-light');
+            if (isDarkTheme()) {
+                slider.classList.add('hover-dark');
+            } else {
+                slider.classList.add('hover-light');
+            }
+        }
+        
+        // 检测是否为深色主题
+        function isDarkTheme() {
+            const body = document.body;
+            const html = document.documentElement;
+            
+            // 检查常见的深色主题标识
+            if (body.classList.contains('dark-theme') || body.classList.contains('dark-mode')) {
+                return true;
+            }
+            if (html.classList.contains('dark-theme') || html.classList.contains('dark-mode')) {
+                return true;
+            }
+            
+            // 检查内联样式或计算后的背景色
+            const bodyBg = window.getComputedStyle(body).backgroundColor;
+            const htmlBg = window.getComputedStyle(html).backgroundColor;
+            
+            // 如果背景色是深色（RGB 值较低），则认为是深色主题
+            if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && bodyBg !== 'rgb(255, 255, 255)') {
+                const rgb = bodyBg.match(/\d+/g);
+                if (rgb && rgb.length >= 3) {
+                    const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+                    if (brightness < 128) {
+                        return true;
+                    }
+                }
+            }
+            
+            // 默认返回 false（浅色主题）
+            return false;
         }
 
         function attachListeners() {
@@ -593,21 +645,43 @@
             
             items.forEach(item => {
                 item.addEventListener('mouseenter', () => moveSlider(item));
+                item.addEventListener('mouseleave', () => {
+                    // 鼠标离开时恢复为主题色（active 状态的颜色）
+                    slider.classList.remove('hover-dark', 'hover-light');
+                    // 重新定位到 active 元素
+                    const activeItem = document.querySelector('.navbar-nav > li.active > a, .nav-tabs > li.active > a, .contest-problem-menu > li.active > a');
+                    if (activeItem) {
+                        setTimeout(() => moveSliderToActive(activeItem), 50);
+                    }
+                });
                 item.addEventListener('click', () => {
                     // 延迟一点等待 active 类切换
                     setTimeout(() => moveSlider(item), 50);
                 });
             });
 
-            // 初始化位置：找到当前 active 的元素
+            // 初始化位置：找到当前 active 的元素（使用主题色，不使用悬停色）
             const activeItem = document.querySelector('.navbar-nav > li.active > a, .nav-tabs > li.active > a, .contest-problem-menu > li.active > a');
             if (activeItem) {
                 // 稍微延迟确保布局完成
-                setTimeout(() => moveSlider(activeItem), 100);
+                setTimeout(() => moveSliderToActive(activeItem), 100);
             } else if (items.length > 0) {
                 // 如果没有 active，默认第一个
-                setTimeout(() => moveSlider(items[0]), 100);
+                setTimeout(() => moveSliderToActive(items[0]), 100);
             }
+        }
+        
+        // 移动到 active 位置（使用主题色，不应用悬停色）
+        function moveSliderToActive(target) {
+            if (!target) return;
+            const rect = target.getBoundingClientRect();
+            
+            slider.style.width = `${rect.width}px`;
+            slider.style.left = `${rect.left}px`;
+            slider.style.top = `${rect.bottom - 3}px`;
+            
+            // 移除悬停颜色类，保持主题色
+            slider.classList.remove('hover-dark', 'hover-light');
         }
 
         // 监听 DOM 变化以应对 SPA 路由或动态加载
@@ -621,7 +695,7 @@
         // 窗口大小改变时重算
         window.addEventListener('resize', () => {
             const activeItem = document.querySelector('.navbar-nav > li.active > a, .nav-tabs > li.active > a, .contest-problem-menu > li.active > a');
-            if(activeItem) moveSlider(activeItem);
+            if(activeItem) moveSliderToActive(activeItem);
         });
     }
 
