@@ -14,7 +14,7 @@
 ## 🚀 安装方法
 
 1. 确保浏览器已安装 [Tampermonkey](https://www.tampermonkey.net/) 扩展
-2. 点击 [VJudgeBetter.user.js](./VJudgeBetter.user.js) 文件
+2. 点击 [app.js](./app.js) 文件
 3. Tampermonkey 会自动识别并提示安装
 4. 访问 VJudge 网站即可生效
 
