@@ -65,9 +65,11 @@
         }
         /* 排除背景容器、滑块、图片、SVG 和图标元素，避免异常动画和渲染问题 */
         #vjb-bg-container, #vjb-bg-image, #vjb-bg-video, .vjb-nav-slider,
-        img, svg, icon, i[class*="fa"], i[class*="glyphicon"], 
-        [class*="icon"], [class*="Icon"], [class*="flag"],
-        .btn > img, .btn > svg, button > img, button > svg, a > img, a > svg {
+        img, svg, icon, i.fa, i.glyphicon, i[class*="fa"], i[class*="glyphicon"],
+        [class*="icon"], [class*="Icon"], [class*="flag"], [class^="icon"], [class^="Icon"], [class^="flag"],
+        .btn > img, .btn > svg, button > img, button > svg, a > img, a > svg,
+        .btn > i, button > i, a > i, .btn > .fa, .btn > .glyphicon,
+        [class*="flag-icon"] {
             transition: none !important;
         }
 
@@ -217,21 +219,24 @@
         /* 使用更通用的选择器，确保覆盖嵌套内容 */
         body, .container, #description-container, .problem-content, .markdown-body,
         [class*="problem"], [id*="problem"], .content, .article, .text, .description, .statement,
-        table, td, th, li, ul, ol, p, span, div, a, button, input:not(.ace_text-input), select, label,
-        h1, h2, h3, h4, h5, h6, strong, em, b, i, u {
+        table, td, th, li, ul, ol, p, span:not([class*="flag"]):not([class*="icon"]):not(.fa):not(.glyphicon), 
+        div:not([class*="flag"]):not([class*="icon"]):not(.fa):not(.glyphicon), 
+        a, button, input:not(.ace_text-input), select, label,
+        h1, h2, h3, h4, h5, h6, strong, em, b, u {
             font-family: var(--vjb-font-content, 'Google Sans'), sans-serif !important;
         }
         
         /* 特殊排除：确保代码块内部、图片、SVG、图标不受 content 字体影响 */
         pre *, code *, .ace_editor *, [class*="code"] *, [id*="code"] *, .source-code *, .code-block *,
-        img *, svg *, [class*="icon"] *, [class*="Icon"] *, [class*="flag"] *,
-        i[class*="fa"] *, i[class*="glyphicon"] * {
-            font-family: var(--vjb-font-code, 'JetBrains Mono NL') !important;
+        img *, svg *, icon *, [class*="icon"] *, [class*="Icon"] *, [class*="flag"] *,
+        i.fa *, i.glyphicon *, i[class*="fa"] *, i[class*="glyphicon"] * {
+            font-family: inherit !important;
         }
         
-        /* 特别排除：图片和 SVG 元素本身不应应用任何字体 */
-        img, svg, icon, [class*="icon"], [class*="Icon"], [class*="flag"],
-        i[class*="fa"], i[class*="glyphicon"] {
+        /* 特别排除：图片和 SVG 元素本身不应应用任何字体，图标元素应使用其自身字体 */
+        img, svg, icon, [class*="icon"], [class*="Icon"], [class*="flag"], [class^="icon"], [class^="Icon"], [class^="flag"],
+        i.fa, i.glyphicon, i[class*="fa"], i[class*="glyphicon"],
+        .fa, .glyphicon, .flag-icon {
             font-family: inherit !important;
         }
         
