@@ -59,12 +59,15 @@
 
     // ================= 样式注入 =================
     const styles = `
-        /* --- 全局平滑过渡 (排除背景和滑块) --- */
+        /* --- 全局平滑过渡 (排除背景、滑块、图片和特殊元素) --- */
         body, div, span, a, button, input, table, tr, td, th, li, ul, .nav-slider {
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
         }
-        /* 排除背景容器和滑块，避免异常动画 */
-        #vjb-bg-container, #vjb-bg-image, #vjb-bg-video, .vjb-nav-slider {
+        /* 排除背景容器、滑块、图片、SVG 和图标元素，避免异常动画和渲染问题 */
+        #vjb-bg-container, #vjb-bg-image, #vjb-bg-video, .vjb-nav-slider,
+        img, svg, icon, i[class*="fa"], i[class*="glyphicon"], 
+        [class*="icon"], [class*="Icon"], [class*="flag"],
+        .btn > img, .btn > svg, button > img, button > svg, a > img, a > svg {
             transition: none !important;
         }
 
@@ -210,7 +213,7 @@
             font-family: var(--vjb-font-code, 'JetBrains Mono NL') !important;
         }
         
-        /* 全局其他内容 (统一使用 content 字体) - 排除代码区域 */
+        /* 全局其他内容 (统一使用 content 字体) - 排除代码区域和图片/图标元素 */
         /* 使用更通用的选择器，确保覆盖嵌套内容 */
         body, .container, #description-container, .problem-content, .markdown-body,
         [class*="problem"], [id*="problem"], .content, .article, .text, .description, .statement,
@@ -219,9 +222,17 @@
             font-family: var(--vjb-font-content, 'Google Sans'), sans-serif !important;
         }
         
-        /* 特殊排除：确保代码块内部不受 content 字体影响 */
-        pre *, code *, .ace_editor *, [class*="code"] *, [id*="code"] *, .source-code *, .code-block * {
+        /* 特殊排除：确保代码块内部、图片、SVG、图标不受 content 字体影响 */
+        pre *, code *, .ace_editor *, [class*="code"] *, [id*="code"] *, .source-code *, .code-block *,
+        img *, svg *, [class*="icon"] *, [class*="Icon"] *, [class*="flag"] *,
+        i[class*="fa"] *, i[class*="glyphicon"] * {
             font-family: var(--vjb-font-code, 'JetBrains Mono NL') !important;
+        }
+        
+        /* 特别排除：图片和 SVG 元素本身不应应用任何字体 */
+        img, svg, icon, [class*="icon"], [class*="Icon"], [class*="flag"],
+        i[class*="fa"], i[class*="glyphicon"] {
+            font-family: inherit !important;
         }
         
         /* --- 榜单美化 --- */
