@@ -37,61 +37,62 @@
 
 ### 安装 Beta 版
 
-复制本仓库中 **默认分支** 的 `app.js` 完整源码。其它步骤与安装正式版的步骤相同。
+复制本仓库中 **默认分支** 的 `app.js` 完整源码，其它步骤与安装正式版的步骤相同。
 
-## 📄 开源许可证
+## 开源许可证
 
 本项目基于 **MIT License** 协议开源。
 
-## 欢迎提交 Issues 和 PRs!
+## 欢迎提交 Issue 和 PR！
 
-# VJudgeBetter 🚀
-
-A modern, beautified, and performance-enhanced Tampermonkey script customized for Virtual Judge (VJudge).
-
-## Core Features
-
-* **Global Dynamic Theme Color**: Replace all remaining native blue elements—including primary buttons, submit buttons, active radio boxes, breadcrumbs, and status badges—with a personalized theme color of your choice.
-* **Custom Fonts**: Customize your preferred code font and reading font directly via the control panel.
-* **Contest Top Bar Reshaping**: Beautified contest progress bar.
-* **Background Settings**: Customize the VJudge background. Supports `.jpg`, `.png`, `.webp`, **`.gif`**, **`.mp3`**, and **`.mp4`**. Can be reset to default with one click.
-* **Auto-Update (In Progress...)**: Automatically detect and update the VJudgeBetter version.
-
-## Usage Guide
-
-### Open the Settings Panel
-
-Click the Tampermonkey browser extension icon → find and click `⚙️ VJudgeBetter Settings` in the bottom right corner to open it.
-
-### Settings Guide
-
-| Setting Item | Description |
-| --- | --- |
-| **Personalized Global Theme Color** | Click the native color picker to select any custom color you like. |
-| **Code Font** | Customize your favorite monospaced programming font. Supports `JetBrains Mono`, `Fira Code`, `Consolas`, etc. (requires the font to be installed locally). You can also enter specific custom fonts installed on your computer in the input box below. |
-| **Reading Font** | Sets the font for all body text, tables, and problem descriptions (excluding mathematical formulas). You can manually specify a special font installed on your system in the input box below. |
-| **Background Media Hosting** | Click or drag files into the dashed box (supports images/GIFs up to 5MB, or MP4 videos up to 20MB). Video backgrounds will automatically enable mute, hardware acceleration, and infinite looping. |
-| **Background Opacity** | Freely drag the percentage slider (0% - 100%). |
-
-## Installation
-
-### Install Stable Version
-
-1. Ensure you have installed the [Tampermonkey](https://www.tampermonkey.net/) extension in your browser.
-2. Go to the [GitHub Release](https://github.com/wyh120715/VJudge-Better/releases). Alternatively, you can install it directly from [GreasyFork](https://www.google.com/search?q=https://greasyfork.org/zh-CN/scripts/583544-vjudgebetter); if you choose this method, you can skip step 3.
-3. Open the Tampermonkey dashboard, click "Create a new script," clear the existing template, paste the copied code, and save (`Ctrl + S`).
-4. Refresh the VJudge webpage to apply the changes.
-
-### Install Beta Version
-
-Copy the full source code of `app.js` from the **default branch** of this repository. The remaining steps are the same as installing the stable version.
+欢迎随时提交 **Issue** 和 **PR**！
 
 ---
 
-## 📄 Open Source License
+# VJudgeBetter 🚀
+
+A modern Tampermonkey script designed to enhance the aesthetics and performance of Virtual Judge (VJudge).
+
+## Key Features
+
+- **Dynamic Global Color Customization**: Replaces the site's default blue accents—including primary buttons, submit buttons, active radio buttons, breadcrumbs, and status badges—with a custom theme color of your choice.
+- **Custom Fonts**: Customize your preferred fonts for code blocks and general reading text via the control panel.
+- **Contest Header Redesign**: Enhanced styling for the contest time progress bar.
+- **Background Settings**: Set a custom background for VJudge; supports `.jpg`, `.png`, `.webp`, `.gif`, `.mp3`, and `.mp4` formats. Includes a one-click reset option to disable the background.
+- **Auto-Update (In Progress...)**: Automatically checks for and installs VJudgeBetter updates.
+
+## Usage Instructions
+
+### Opening the Settings Panel
+
+Click the Tampermonkey browser extension icon → locate and click `⚙️ VJudgeBetter Settings` in the bottom-right corner to open the panel.
+
+### Settings Guide
+
+| Setting | Description |
+| :--: | :--- |
+| **Custom Global Theme Color** | Click the color picker to select your own unique theme color. |
+| **Code Font** | Customize your monospaced coding font (e.g., `JetBrains Mono`, `Fira Code`, `Consolas`). Note: You must have these fonts installed locally on your computer. You can also enter the name of any niche font installed on your system in the input box below. |
+| **Reading Font** | Switches the font for body text, tables, and problem descriptions (excluding mathematical formulas) across the site. You can manually specify a custom system font in the input box below. |
+| **Background Media Upload** | Click or drag files into the dashed-line box (supports images/GIFs up to 5MB or MP4 videos up to 20MB). Video backgrounds automatically enable mute, hardware acceleration, and infinite looping. |
+| **Background Opacity** | Adjust the opacity using the percentage slider (0% - 100%). | |
+
+## Installation
+
+### Installing the Release Version
+
+1. Ensure you have the [Tampermonkey](https://www.tampermonkey.net/) extension installed in your browser.
+2. Go to the [GitHub Releases](https://github.com/wyh120715/VJudge-Better/releases) page. Alternatively, you can install it directly from [GreasyFork](https://greasyfork.org/zh-CN/scripts/583544-vjudgebetter); if you choose this method, you can skip step 3.
+3. Open the Tampermonkey dashboard, click "Add new script," clear the default template, paste the copied code, and save it (`Ctrl + S`).
+4. Refresh the VJudge webpage.
+
+### Installing the Beta Version
+
+Copy the full source code of `app.js` from the repository's **default branch**. The remaining steps are the same as those for installing the release version.
+
+## Open Source License
 
 This project is open-sourced under the **MIT License**.
 
-## Contributions Welcome!
-
+## Issues and PRs are welcome!
 Feel free to submit **Issues** and **PRs**!
