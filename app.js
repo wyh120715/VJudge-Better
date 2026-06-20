@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VJudgeBetter
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2-Beta
 // @description  VJudge 增强脚本
 // @author       wyh120715
 // @match        https://vjudge.net/*
@@ -21,7 +21,7 @@
 
     if (window.top !== window.self) return;
 
-    // ================= IndexedDB 存储 (支持大型视频/壁纸) =================
+    // ================= IndexedDB 高性能二进制存储 (防大背景文件崩溃) =================
     const localDB = {
         init() {
             return new Promise((resolve, reject) => {
@@ -77,7 +77,7 @@
     let selectedFileData = null;
     let activeBgObjectURL = '';
 
-    // ================= 样式注入 (全面无死角接管系统) =================
+    // ================= 样式注入 (多维精准覆盖系统) =================
     const styles = `
         :root {
             --vjb-fallback-bg: #f8f9fa;
@@ -139,7 +139,7 @@
             opacity: var(--vjb-opacity, 0.85); transition: opacity 0.5s ease;
         }
 
-        /* ========== 💡 强力清洗 ID 级与弹窗选项按钮的主题色残留 ========== */
+        /* ========== 主要按钮、单选激活态的主题色重塑 ========== */
         #problem-submit,
         .btn-primary,
         .btn-check:checked + .btn,
@@ -151,11 +151,10 @@
         .nav-pills > li.active > a {
             background-color: var(--vjb-theme, #4a90e2) !important;
             border-color: var(--vjb-theme, #4a90e2) !important;
-            background-image: none !important; /* 彻底移除原生渐变蓝层 */
+            background-image: none !important;
             color: #ffffff !important;
         }
 
-        /* 💡 修复提交按钮在没有 hover 时的原生半透蓝色残留 */
         #problem-submit.btn-outline-primary, .btn-outline-primary {
             color: var(--vjb-theme, #4a90e2) !important;
             border-color: var(--vjb-theme, #4a90e2) !important;
@@ -166,30 +165,45 @@
             color: #ffffff !important;
         }
 
-        /* ========== 💡 完美修复“官方”、“中文”等胶囊边框与文本换色 ========== */
-        .statement-badge, .statement-badge-lang, .badge {
-            border: 1px solid var(--vjb-theme, #4a90e2) !important;
-            color: var(--vjb-theme, #4a90e2) !important;
-            background-color: transparent !important;
+        /* ========== 💡 完美修复：页码选择器洗蓝扩展 ========== */
+        .pagination .active .page-link,
+        .pagination .page-item.active .page-link,
+        .pagination > .active > a,
+        .pagination > .active > span,
+        .page-link.active {
+            background-color: var(--vjb-theme, #4a90e2) !important;
+            border-color: var(--vjb-theme, #4a90e2) !important;
+            background-image: none !important;
+            color: #ffffff !important;
         }
+
+        /* ========== 💡 核心修复：精准保护角色状态标签 (团长/管理员/成员/已解决等) ========== */
+        /* 仅对原生亮蓝色的基本徽章执行换色，其他语义化色彩完全放过，不干扰其底色 */
         .badge.text-bg-primary, .badge.bg-primary {
             background-color: var(--vjb-theme, #4a90e2) !important;
             color: #ffffff !important;
             border: none !important;
         }
+        .badge.border-primary, .badge.text-primary, .statement-badge-lang {
+            border-color: var(--vjb-theme, #4a90e2) !important;
+            color: var(--vjb-theme, #4a90e2) !important;
+            background-color: transparent !important;
+        }
+        .problem-description-item.active .statement-badge {
+            border-color: var(--vjb-theme, #4a90e2) !important;
+            color: var(--vjb-theme, #4a90e2) !important;
+        }
 
-        /* 全站基础文字色彩共鸣 */
+        .btn-outline-primary {
+            color: var(--vjb-theme, #4a90e2) !important;
+            border-color: var(--vjb-theme, #4a90e2) !important;
+        }
+
         .text-primary { color: var(--vjb-theme, #4a90e2) !important; }
         .bg-primary { background-color: var(--vjb-theme, #4a90e2) !important; }
         .border-primary { border-color: var(--vjb-theme, #4a90e2) !important; }
 
-        .pagination > .active > a, .pagination > .active > span {
-            background-color: var(--vjb-theme, #4a90e2) !important;
-            border-color: var(--vjb-theme, #4a90e2) !important;
-            color: #ffffff !important;
-        }
-
-        /* 导航条统一洗蓝 */
+        /* 导航链接清洗 */
         .navbar-nav .nav-link, .nav-tabs .nav-link, .contest-problem-menu .nav-link, .btn-link {
             position: relative; overflow: hidden; color: var(--vjb-text-muted) !important;
             transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
@@ -199,7 +213,7 @@
             border-bottom: none !important; background: transparent !important; color: var(--vjb-theme, #4a90e2) !important; font-weight: bold !important;
         }
 
-        /* 非激活题目标签对比度提升 */
+        /* 题号高亮对比度提升 */
         .nav-pills .nav-link:not(.active), #problem-nav .nav-link:not(.active) {
             color: var(--vjb-text-muted) !important; background: transparent !important; font-weight: 500 !important;
         }
@@ -207,7 +221,7 @@
             color: var(--vjb-theme, #4a90e2) !important; background: var(--vjb-hover-bg) !important;
         }
 
-        /* 次要功能按钮组美化 */
+        /* 功能辅助灰色按钮美化 */
         #prob-operation .btn-secondary {
             background-color: var(--vjb-btn-sec-bg) !important; border: 1px solid var(--vjb-card-border) !important; color: var(--vjb-text-muted) !important; box-shadow: none !important;
         }
@@ -215,13 +229,13 @@
             border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme, #4a90e2) !important; background-color: var(--vjb-hover-bg) !important; box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important;
         }
 
-        /* 翻译卡片融合 */
+        /* 翻译列表卡片半透融合 */
         .list-group-item.active {
             background-color: var(--vjb-hover-bg) !important; border: 1px solid var(--vjb-card-border) !important; border-left: 4px solid var(--vjb-theme, #4a90e2) !important; color: var(--vjb-text-main) !important; box-shadow: none !important;
         }
         .list-group-item.active .statement-author-row a, .list-group-item.active .statement-author-row span { color: var(--vjb-theme, #4a90e2) !important; font-weight: bold !important; }
 
-        /* 比赛时间顶栏卡片磨砂玻璃化 */
+        /* ========== 💡 比赛顶栏 (#time-info) 磨砂玻璃层与滑块重塑复活 ========== */
         #time-info {
             background: var(--vjb-card-bg) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important; border: 1px solid var(--vjb-card-border) !important; border-radius: 14px !important; padding: 20px !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important; margin-bottom: 25px !important; color: var(--vjb-text-main) !important;
         }
@@ -233,7 +247,7 @@
         .noUi-handle::before, .noUi-handle::after { display: none !important; }
         #info-running { background: rgba(231, 76, 60, 0.12) !important; color: #e74c3c !important; padding: 4px 14px !important; border-radius: 20px !important; font-weight: bold !important; font-size: 13px !important; display: inline-block !important; border: 1px solid rgba(231, 76, 60, 0.25) !important; }
 
-        /* 设置面板样式 */
+        /* 设置控制面板样式 */
         #vjb-float-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: rgba(30, 30, 30, 0.8); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 9998; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
         #vjb-float-btn:hover { transform: scale(1.1) rotate(90deg); background: rgba(60, 60, 60, 0.9); }
         #vjb-float-btn svg { width: 28px; height: 28px; fill: #fff; }
@@ -256,12 +270,11 @@
             font-family: var(--vjb-font-content, 'Google Sans'), sans-serif !important;
         }
 
-        /* 剔除多行文本框的全局干扰，确保提交框强制使用等宽编程字体 */
         textarea:not(#submit-solution):not([name="source"]) {
             font-family: var(--vjb-font-content, 'Google Sans'), sans-serif !important;
         }
 
-        /* 💡 靶向锁定：代码块、Ace编辑器、以及代码提交弹窗内部输入区，一并强制纠正为编程字体 */
+        /* 强制等宽编程字体，确保代码框无缝捕获 */
         pre, code:not([class*="math"]):not([class*="katex"]):not([class*="MathJax"]),
         kbd, samp, .ace_editor, .source-code,
         #submit-solution, textarea[name="source"], .modal-body textarea {
@@ -269,12 +282,13 @@
         }
         pre *, code *, .ace_editor *, .source-code * { font-family: inherit !important; }
 
-        /* AtCoder 裸写独立变量防御 */
+        /* AtCoder 独立变量原生态重塑 */
         var:not(:has(.katex)):not(:has([class*="katex"])):not(:has([class*="MathJax"])) {
             font-family: "Times New Roman", "Cambria", "MathJax_Math", serif !important;
             font-style: italic !important;
         }
 
+        /* 榜单优化 */
         .standings-table thead tr { background: linear-gradient(90deg, rgba(74,144,226,0.1) 0%, rgba(74,144,226,0.3) 100%) !important; }
         .standings-table tbody tr:hover { background: var(--vjb-hover-bg) !important; transform: scale(1.005); }
         .status-accepted { color: #2ecc71 !important; font-weight: bold; }
@@ -286,7 +300,7 @@
     `;
     GM_addStyle(styles);
 
-    // ================= 💡 核心功能：向题面 iframe 内部灌入带防御机制的字体样式 =================
+    // ================= 同源穿透向题面 iframe 灌入非干预继承性字体样式 =================
     function injectIframeStyles(iframe) {
         if (!iframe) return;
         try {
@@ -572,7 +586,7 @@
         }
     }
 
-    // ================= 极致柔和滑动逻辑 =================
+    // ================= 极致柔和滑动逻辑 (事件委托) =================
     function initNavSlider() {
         let slider = document.querySelector('.vjb-nav-slider');
         if (!slider) {
