@@ -1,6 +1,6 @@
 # VJudgeBetter 🚀
 
-一个专为 Virtual Judge (VJudge) 定制的现代化、美化与性能增强油猴脚本。
+一个为 Virtual Judge (VJudge) 定制的现代化、美化与性能增强油猴脚本。
 
 ## 核心功能
 
