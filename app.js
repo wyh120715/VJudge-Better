@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VJudgeBetter
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  VJudge 增强脚本
 // @author       wyh120715
 // @match        https://vjudge.net/*
@@ -11,6 +11,9 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @run-at       document-start
+// @license      MIT
+// @downloadURL https://update.greasyfork.org/scripts/583544/VJudgeBetter.user.js
+// @updateURL https://update.greasyfork.org/scripts/583544/VJudgeBetter.meta.js
 // ==/UserScript==
 
 (function() {
@@ -18,7 +21,7 @@
 
     if (window.top !== window.self) return;
 
-    // ================= IndexedDB 封装 =================
+    // ================= IndexedDB 存储 (支持大型视频/壁纸) =================
     const localDB = {
         init() {
             return new Promise((resolve, reject) => {
@@ -74,7 +77,7 @@
     let selectedFileData = null;
     let activeBgObjectURL = '';
 
-    // ================= 样式注入 (多主题自适应系统) =================
+    // ================= 样式注入 (全面无死角接管系统) =================
     const styles = `
         :root {
             --vjb-fallback-bg: #f8f9fa;
@@ -136,102 +139,49 @@
             opacity: var(--vjb-opacity, 0.85); transition: opacity 0.5s ease;
         }
 
-        .nav-pills .nav-link:not(.active),
-        #problem-nav .nav-link:not(.active) {
-            color: var(--vjb-text-muted) !important;
-            background: transparent !important;
-            font-weight: 500 !important;
-        }
-        .nav-pills .nav-link:not(.active):hover,
-        #problem-nav .nav-link:not(.active):hover {
-            color: var(--vjb-theme, #4a90e2) !important;
-            background: var(--vjb-hover-bg) !important;
-        }
+        /* ========== 💡 强力清洗 ID 级与弹窗选项按钮的主题色残留 ========== */
+        #problem-submit,
+        .btn-primary,
+        .btn-check:checked + .btn,
+        .btn-check:checked + .btn-primary,
+        .btn-check:checked + .btn-outline-primary,
+        .btn-group > .btn.active,
+        .btn-group > .btn:active,
         .nav-pills .nav-link.active,
         .nav-pills > li.active > a {
             background-color: var(--vjb-theme, #4a90e2) !important;
             border-color: var(--vjb-theme, #4a90e2) !important;
+            background-image: none !important; /* 彻底移除原生渐变蓝层 */
             color: #ffffff !important;
         }
 
-        #prob-operation .btn {
-            border-radius: 6px !important;
-            font-weight: 500 !important;
-        }
-        #prob-operation .btn-secondary {
-            background-color: var(--vjb-btn-sec-bg) !important;
-            border: 1px solid var(--vjb-card-border) !important;
-            color: var(--vjb-text-muted) !important;
-            box-shadow: none !important;
-        }
-        #prob-operation .btn-secondary:hover {
-            border-color: var(--vjb-theme, #4a90e2) !important;
-            color: var(--vjb-theme, #4a90e2) !important;
-            background-color: var(--vjb-hover-bg) !important;
-            box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important;
-        }
-
-        .list-group-item.active {
-            background-color: var(--vjb-hover-bg) !important;
-            border: 1px solid var(--vjb-card-border) !important;
-            border-left: 4px solid var(--vjb-theme, #4a90e2) !important;
-            color: var(--vjb-text-main) !important;
-            box-shadow: none !important;
-        }
-        .list-group-item.active .statement-author-row a,
-        .list-group-item.active .statement-author-row span {
-            color: var(--vjb-theme, #4a90e2) !important;
-            font-weight: bold !important;
-        }
-
-        .navbar-nav .nav-link,
-        .nav-tabs .nav-link,
-        .contest-problem-menu .nav-link,
-        .btn-link {
-            position: relative;
-            overflow: hidden;
-            color: var(--vjb-text-muted) !important;
-            transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
-        }
-        .navbar-nav .nav-link:hover,
-        .nav-tabs .nav-link:hover,
-        .contest-problem-menu .nav-link:hover {
-            color: var(--vjb-theme, #4a90e2) !important;
-        }
-        .navbar-nav .active > .nav-link,
-        .navbar-nav .nav-link.active,
-        .nav-tabs .nav-link.active,
-        .contest-problem-menu .nav-link.active {
-            border-bottom: none !important;
-            background: transparent !important;
-            color: var(--vjb-theme, #4a90e2) !important;
-            font-weight: bold !important;
-        }
-
-        .btn-primary {
-            background-color: var(--vjb-theme, #4a90e2) !important;
-            border-color: var(--vjb-theme, #4a90e2) !important;
-            color: #ffffff !important;
-        }
-        .btn-primary:hover, .btn-primary:focus {
-            background-color: var(--vjb-theme, #4a90e2) !important;
-            border-color: var(--vjb-theme, #4a90e2) !important;
-            filter: brightness(0.9) !important;
-        }
-        .btn-outline-primary {
+        /* 💡 修复提交按钮在没有 hover 时的原生半透蓝色残留 */
+        #problem-submit.btn-outline-primary, .btn-outline-primary {
             color: var(--vjb-theme, #4a90e2) !important;
             border-color: var(--vjb-theme, #4a90e2) !important;
             background-color: transparent !important;
         }
-        .btn-outline-primary:hover, .btn-outline-primary:focus {
+        #problem-submit.btn-outline-primary:hover, .btn-outline-primary:hover {
             background-color: var(--vjb-theme, #4a90e2) !important;
-            border-color: var(--vjb-theme, #4a90e2) !important;
             color: #ffffff !important;
-            box-shadow: 0 0 8px var(--vjb-theme, #4a90e2);
         }
 
+        /* ========== 💡 完美修复“官方”、“中文”等胶囊边框与文本换色 ========== */
+        .statement-badge, .statement-badge-lang, .badge {
+            border: 1px solid var(--vjb-theme, #4a90e2) !important;
+            color: var(--vjb-theme, #4a90e2) !important;
+            background-color: transparent !important;
+        }
+        .badge.text-bg-primary, .badge.bg-primary {
+            background-color: var(--vjb-theme, #4a90e2) !important;
+            color: #ffffff !important;
+            border: none !important;
+        }
+
+        /* 全站基础文字色彩共鸣 */
         .text-primary { color: var(--vjb-theme, #4a90e2) !important; }
         .bg-primary { background-color: var(--vjb-theme, #4a90e2) !important; }
+        .border-primary { border-color: var(--vjb-theme, #4a90e2) !important; }
 
         .pagination > .active > a, .pagination > .active > span {
             background-color: var(--vjb-theme, #4a90e2) !important;
@@ -239,104 +189,90 @@
             color: #ffffff !important;
         }
 
+        /* 导航条统一洗蓝 */
+        .navbar-nav .nav-link, .nav-tabs .nav-link, .contest-problem-menu .nav-link, .btn-link {
+            position: relative; overflow: hidden; color: var(--vjb-text-muted) !important;
+            transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+        }
+        .navbar-nav .nav-link:hover, .nav-tabs .nav-link:hover, .contest-problem-menu .nav-link:hover { color: var(--vjb-theme, #4a90e2) !important; }
+        .navbar-nav .active > .nav-link, .navbar-nav .nav-link.active, .nav-tabs .nav-link.active, .contest-problem-menu .nav-link.active {
+            border-bottom: none !important; background: transparent !important; color: var(--vjb-theme, #4a90e2) !important; font-weight: bold !important;
+        }
+
+        /* 非激活题目标签对比度提升 */
+        .nav-pills .nav-link:not(.active), #problem-nav .nav-link:not(.active) {
+            color: var(--vjb-text-muted) !important; background: transparent !important; font-weight: 500 !important;
+        }
+        .nav-pills .nav-link:not(.active):hover, #problem-nav .nav-link:not(.active):hover {
+            color: var(--vjb-theme, #4a90e2) !important; background: var(--vjb-hover-bg) !important;
+        }
+
+        /* 次要功能按钮组美化 */
+        #prob-operation .btn-secondary {
+            background-color: var(--vjb-btn-sec-bg) !important; border: 1px solid var(--vjb-card-border) !important; color: var(--vjb-text-muted) !important; box-shadow: none !important;
+        }
+        #prob-operation .btn-secondary:hover {
+            border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme, #4a90e2) !important; background-color: var(--vjb-hover-bg) !important; box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important;
+        }
+
+        /* 翻译卡片融合 */
+        .list-group-item.active {
+            background-color: var(--vjb-hover-bg) !important; border: 1px solid var(--vjb-card-border) !important; border-left: 4px solid var(--vjb-theme, #4a90e2) !important; color: var(--vjb-text-main) !important; box-shadow: none !important;
+        }
+        .list-group-item.active .statement-author-row a, .list-group-item.active .statement-author-row span { color: var(--vjb-theme, #4a90e2) !important; font-weight: bold !important; }
+
+        /* 比赛时间顶栏卡片磨砂玻璃化 */
         #time-info {
-            background: var(--vjb-card-bg) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-            border: 1px solid var(--vjb-card-border) !important;
-            border-radius: 14px !important;
-            padding: 20px !important;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
-            margin-bottom: 25px !important;
-            color: var(--vjb-text-main) !important;
+            background: var(--vjb-card-bg) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important; border: 1px solid var(--vjb-card-border) !important; border-radius: 14px !important; padding: 20px !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important; margin-bottom: 25px !important; color: var(--vjb-text-main) !important;
         }
         #time-info h3 { color: var(--vjb-text-main) !important; }
-
-        .contest-time-progress {
-            background: var(--vjb-theme, #4a90e2) !important;
-            box-shadow: 0 0 12px var(--vjb-theme, #4a90e2);
-            border-radius: 4px !important;
-        }
-        #contest-time.noUi-target {
-            background: rgba(128, 128, 128, 0.15) !important;
-            border: none !important;
-            height: 6px !important;
-            border-radius: 4px !important;
-        }
-
-        .noUi-handle {
-            width: 16px !important; height: 16px !important;
-            right: -8px !important; top: -5px !important;
-            background: #ffffff !important;
-            border: 3px solid var(--vjb-theme, #4a90e2) !important;
-            border-radius: 50% !important;
-            box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important;
-            cursor: pointer !important;
-            transition: transform 0.2s !important;
-        }
+        .contest-time-progress { background: var(--vjb-theme, #4a90e2) !important; box-shadow: 0 0 12px var(--vjb-theme, #4a90e2); border-radius: 4px !important; }
+        #contest-time.noUi-target { background: rgba(128, 128, 128, 0.15) !important; border: none !important; height: 6px !important; border-radius: 4px !important; }
+        .noUi-handle { width: 16px !important; height: 16px !important; right: -8px !important; top: -5px !important; background: #ffffff !important; border: 3px solid var(--vjb-theme, #4a90e2) !important; border-radius: 50% !important; box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important; cursor: pointer !important; transition: transform 0.2s !important; }
         .noUi-handle:hover { transform: scale(1.25); }
         .noUi-handle::before, .noUi-handle::after { display: none !important; }
+        #info-running { background: rgba(231, 76, 60, 0.12) !important; color: #e74c3c !important; padding: 4px 14px !important; border-radius: 20px !important; font-weight: bold !important; font-size: 13px !important; display: inline-block !important; border: 1px solid rgba(231, 76, 60, 0.25) !important; }
 
-        #info-running {
-            background: rgba(231, 76, 60, 0.12) !important;
-            color: #e74c3c !important;
-            padding: 4px 14px !important;
-            border-radius: 20px !important;
-            font-weight: bold !important;
-            font-size: 13px !important;
-            display: inline-block !important;
-            border: 1px solid rgba(231, 76, 60, 0.25) !important;
-        }
-
-        #vjb-float-btn {
-            position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px;
-            background: rgba(30, 30, 30, 0.8); backdrop-filter: blur(10px);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 9998; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+        /* 设置面板样式 */
+        #vjb-float-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: rgba(30, 30, 30, 0.8); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 9998; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
         #vjb-float-btn:hover { transform: scale(1.1) rotate(90deg); background: rgba(60, 60, 60, 0.9); }
         #vjb-float-btn svg { width: 28px; height: 28px; fill: #fff; }
-
-        #vjb-settings-panel {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
-            width: 420px; max-height: 85vh; background: rgba(20, 20, 20, 0.95);
-            backdrop-filter: blur(20px); border-radius: 16px; padding: 25px; z-index: 9999;
-            color: #eee; box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; pointer-events: none;
-            border: 1px solid rgba(255,255,255,0.1); overflow-y: auto; transition: all 0.3s;
-        }
+        #vjb-settings-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); width: 420px; max-height: 85vh; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); border-radius: 16px; padding: 25px; z-index: 9999; color: #eee; box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; border: 1px solid rgba(255,255,255,0.1); overflow-y: auto; transition: all 0.3s; }
         #vjb-settings-panel.active { opacity: 1; pointer-events: all; transform: translate(-50%, -50%) scale(1); }
         .vjb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         .vjb-title { font-size: 18px; font-weight: bold; color: #fff; }
         .vjb-close { cursor: pointer; font-size: 24px; color: #aaa; transition: color 0.2s; }
         .vjb-close:hover { color: #fff; }
-
         .vjb-group { margin-bottom: 20px; }
         .vjb-label { display: block; margin-bottom: 8px; font-size: 14px; color: #ccc; }
         .vjb-select, .vjb-input { width: 100%; padding: 8px 12px; background: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #333; outline: none; box-sizing: border-box; }
         .vjb-range-wrap { display: flex; align-items: center; gap: 10px; }
         .vjb-range { flex: 1; accent-color: var(--vjb-theme, #4a90e2); }
+        .vjb-nav-slider { position: absolute; height: 3px; background: var(--vjb-theme, #4a90e2); border-radius: 3px 3px 0 0; pointer-events: none; opacity: 0; transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1), width 0.45s cubic-bezier(0.22, 1, 0.36, 1), top 0.4s ease, opacity 0.35s ease; box-shadow: 0 0 8px var(--vjb-theme, #4a90e2); z-index: 9997; will-change: left, width; }
 
-        .vjb-nav-slider {
-            position: absolute; height: 3px; background: var(--vjb-theme, #4a90e2); border-radius: 3px 3px 0 0;
-            pointer-events: none; opacity: 0;
-            transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1), width 0.45s cubic-bezier(0.22, 1, 0.36, 1), top 0.4s ease, opacity 0.35s ease;
-            box-shadow: 0 0 8px var(--vjb-theme, #4a90e2); z-index: 9997; will-change: left, width;
-        }
-
-        /* ========== 💡 基础主页面字体应用：大道至简的自然继承法 ========== */
-        /* 仅覆盖主要的结构性块级容器，放过所有内联元素 (span, i, b, var 等)。
-           这样 KaTeX 和 MathJax 自带的局部专属数学字体 (.mathnormal, .mn) 就能完美覆盖继承，彻底告别公式错位！ */
+        /* ========== 💡 智能字体引擎分配 (自然落级继承法) ========== */
         body, p, h1, h2, h3, h4, h5, h6, table, td, th, tr, li, ul, ol, dl, dt, dd, blockquote,
-        label, input, select, textarea, button, .btn,
-        .markdown-body, .problem-content, .statement {
+        label, input, select, button, .btn, .markdown-body, .problem-content, .statement {
             font-family: var(--vjb-font-content, 'Google Sans'), sans-serif !important;
         }
 
-        /* 代码字体应用，同时避开可能被用作公式载体的 code 标签 */
+        /* 剔除多行文本框的全局干扰，确保提交框强制使用等宽编程字体 */
+        textarea:not(#submit-solution):not([name="source"]) {
+            font-family: var(--vjb-font-content, 'Google Sans'), sans-serif !important;
+        }
+
+        /* 💡 靶向锁定：代码块、Ace编辑器、以及代码提交弹窗内部输入区，一并强制纠正为编程字体 */
         pre, code:not([class*="math"]):not([class*="katex"]):not([class*="MathJax"]),
-        kbd, samp, .ace_editor, .source-code {
+        kbd, samp, .ace_editor, .source-code,
+        #submit-solution, textarea[name="source"], .modal-body textarea {
             font-family: var(--vjb-font-code, 'JetBrains Mono NL'), monospace !important;
+        }
+        pre *, code *, .ace_editor *, .source-code * { font-family: inherit !important; }
+
+        /* AtCoder 裸写独立变量防御 */
+        var:not(:has(.katex)):not(:has([class*="katex"])):not(:has([class*="MathJax"])) {
+            font-family: "Times New Roman", "Cambria", "MathJax_Math", serif !important;
+            font-style: italic !important;
         }
 
         .standings-table thead tr { background: linear-gradient(90deg, rgba(74,144,226,0.1) 0%, rgba(74,144,226,0.3) 100%) !important; }
@@ -367,22 +303,21 @@
             const codeFont = settings.customFontCode ? `"${settings.customFontCode}"` : settings.fontCode;
             const contentFont = settings.customFontContent ? `"${settings.customFontContent}"` : settings.fontContent;
 
-            // 💡 iframe 内容重构原则：利用 CSS 继承（Cascade），只赋能外层容器，不打扰内层渲染
             style.innerHTML = `
                 body, p, h1, h2, h3, h4, h5, h6, table, td, th, tr, li, ul, ol, dl, dt, dd, blockquote,
-                label, section, article,
-                .markdown-body, .problem-content, .statement {
+                label, section, article, .markdown-body, .problem-content, .statement {
                     font-family: ${contentFont}, sans-serif !important;
                 }
-
+                var {
+                    font-family: "Times New Roman", "Cambria", "MathJax_Math", serif !important;
+                    font-style: italic !important;
+                }
                 pre, code:not([class*="math"]):not([class*="katex"]):not([class*="MathJax"]),
                 kbd, samp, .ace_editor, .source-code {
                     font-family: ${codeFont}, monospace !important;
                 }
             `;
-        } catch(e) {
-            // 跨域防御安全哨兵
-        }
+        } catch(e) {}
     }
 
     function initIframeObserver() {
@@ -487,7 +422,7 @@
         if (document.getElementById('vjb-float-btn')) return;
         const btn = document.createElement('div');
         btn.id = 'vjb-float-btn';
-        btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>`;
+        btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>`;
         btn.onclick = toggleSettingsPanel;
         document.body.appendChild(btn);
     }
@@ -677,9 +612,7 @@
         document.addEventListener('mouseout', (e) => {
             const fromNav = e.target.closest('.navbar-nav, .nav-tabs, .contest-problem-menu');
             const toNav = e.relatedTarget ? e.relatedTarget.closest('.navbar-nav, .nav-tabs, .contest-problem-menu') : null;
-            if (fromNav && !toNav) {
-                activeFinder();
-            }
+            if (fromNav && !toNav) activeFinder();
         });
 
         document.addEventListener('click', (e) => {
@@ -691,7 +624,7 @@
         setTimeout(activeFinder, 300);
     }
 
-    // ================= 初始化 =================
+    // ================= 初始化入口 =================
     function init() {
         loadSettings();
         createFloatButton();
@@ -705,7 +638,6 @@
             initIframeObserver();
         }
 
-        // 绑定主文档 iframe 加载全局捕获哨兵
         document.addEventListener('load', (e) => {
             if (e.target && e.target.tagName === 'IFRAME') {
                 injectIframeStyles(e.target);
