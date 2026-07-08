@@ -10,10 +10,8 @@
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_registerMenuCommand
 // @run-at       document-start
-// @license      MIT
-// @downloadURL https://update.greasyfork.org/scripts/583544/VJudgeBetter.user.js
-// @updateURL https://update.greasyfork.org/scripts/583544/VJudgeBetter.meta.js
 // ==/UserScript==
 
 (function() {
