@@ -15,7 +15,7 @@
 // @run-at       document-start
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
     if (window.top !== window.self) return;
@@ -123,8 +123,9 @@
         }
 
         body { background: transparent !important; }
-        body, div, span, a, button, input, table, tr, td, th, li, ul, .nav-slider { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        #vjb-bg-container, #vjb-bg-image, #vjb-bg-video, .vjb-nav-slider, img, svg, i, [class*="icon"], [class*="fa"], [class*="glyphicon"] { transition: none !important; }
+        body, div, span, a, button, input, li, ul, .nav-slider { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        #vjb-bg-container, #vjb-bg-image, #vjb-bg-video, .vjb-nav-slider, img, svg, i, [class*="icon"], [class*="fa"], [class*="glyphicon"], table, tr, td, th { transition: none !important; }
+        #contest-rank-table *, #listStatus * { transition: none !important; }
 
         #vjb-bg-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -9999; pointer-events: none; overflow: hidden; background: var(--vjb-fallback-bg); }
         #vjb-bg-image, #vjb-bg-video { width: 100%; height: 100%; object-fit: cover; opacity: var(--vjb-opacity, 0.85); transition: opacity 0.5s ease; }
@@ -181,6 +182,8 @@
             padding: 4px !important;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06) !important;
             margin-top: 15px !important;
+        }
+        #listStatus {
             table-layout: auto !important;
         }
 
@@ -199,16 +202,38 @@
             box-shadow: none !important;
         }
 
+        #contest-rank-table th {
+            padding: 6px 2px !important;
+            height: auto !important;
+            min-height: 0 !important;
+        }
+
         table.table th *, #contest-rank-table th *, #listStatus th * {
             text-align: center !important;
         }
 
-        /* 修复 VJudge 的独立包裹的嵌套导致的错位，让它排列整齐居中 */
-        #contest-rank-table th div, table.table th div {
+        /* 修复 VJudge 的独立包裹的嵌套导致的错位，让它排列整齐居中，并且靠拢 */
+        #contest-rank-table th div {
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
+            gap: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        #contest-rank-table th div * {
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1.0 !important;
+            display: inline-block !important;
+            text-align: center !important;
+        }
+        #contest-rank-table th br {
+            display: none !important;
         }
 
         table.table td, #contest-rank-table td, #listStatus td {
@@ -223,6 +248,9 @@
             vertical-align: middle !important;
             text-align: center !important; /* 强制所有数据居中 */
             white-space: nowrap !important;
+        }
+        #contest-rank-table td {
+            padding: 6px 2px !important;
         }
 
         table.table tbody tr:hover td, #contest-rank-table tbody tr:not(.myself):not(.my-team):hover td, #listStatus tbody tr:hover td {
@@ -252,13 +280,13 @@
             font-weight: 700 !important;
         }
 
-        #contest-rank-table td.prob.accepted:not(.fb) {
+        #contest-rank-table td.prob.accepted:not(.fb), #contest-rank-table tr:hover td.prob.accepted:not(.fb) {
             background-color: color-mix(in srgb, rgba(46, 204, 113, 1) 22%, var(--vjb-cell-bg)) !important;
             color: rgba(39, 174, 96, 0.95) !important; font-weight: 600 !important;
         }
-        #contest-rank-table td.prob.accepted.fb { background-image: linear-gradient(135deg, rgba(39, 174, 96, 0.85), rgba(46, 204, 113, 0.85)) !important; color: #ffffff !important; font-weight: 700 !important; }
+        #contest-rank-table td.prob.accepted.fb, #contest-rank-table tr:hover td.prob.accepted.fb { background-image: linear-gradient(135deg, rgba(39, 174, 96, 0.85), rgba(46, 204, 113, 0.85)) !important; color: #ffffff !important; font-weight: 700 !important; }
         #contest-rank-table td.prob span, #contest-rank-table td.prob.accepted span { color: #ff6b6b !important; font-weight: 700 !important; }
-        #contest-rank-table td.prob:not(.accepted):has(span) { background-color: color-mix(in srgb, #e74c3c 15%, var(--vjb-cell-bg)) !important; }
+        #contest-rank-table td.prob:not(.accepted):has(span), #contest-rank-table tr:hover td.prob:not(.accepted):has(span) { background-color: color-mix(in srgb, #e74c3c 15%, var(--vjb-cell-bg)) !important; }
 
         /* 💡 联动主题色的 C++ 语言列标签居中修复 */
         td.language, th.language { text-align: center !important; }
@@ -286,9 +314,11 @@
             justify-content: center !important;
             text-align: center !important;
             margin: 0 auto !important; /* 核心居中引力 */
-            width: fit-content !important;
-            padding: 4px 14px !important;
+            width: auto !important;
+            max-width: none !important;
+            padding: 3px 10px !important;
             border-radius: 4px !important;
+            font-size: 12px !important;
             font-weight: 700 !important;
             letter-spacing: 0.3px !important;
             white-space: nowrap !important;
@@ -409,16 +439,16 @@
 
             // 严密的灰色状态拦截器字典
             const isGrey = lowerTxt.includes("system error") || lowerTxt.includes("internal error") ||
-                           lowerTxt.includes("rejected") || lowerTxt.includes("judgement failed") ||
-                           lowerTxt.includes("security violated") || lowerTxt.includes("denial of judgement") ||
-                           lowerTxt.includes("input preparation failed") || lowerTxt.includes("running") ||
-                           lowerTxt.includes("skipped") || lowerTxt.includes("pending") ||
-                           lowerTxt.includes("in queue") || lowerTxt.includes("waiting") ||
-                           lowerTxt.includes("judging") || lowerTxt.includes("network failed") ||
-                           lowerTxt.includes("login failed") || lowerTxt.includes("submitted") ||
-                           lowerTxt.includes("busy") || lowerTxt.includes("duplicate code") ||
-                           lowerTxt.includes("dumplicate code") || lowerTxt.includes("source code error") ||
-                           lowerTxt.includes("submit error") || lowerTxt.includes("problem unavailable");
+                lowerTxt.includes("rejected") || lowerTxt.includes("judgement failed") ||
+                lowerTxt.includes("security violated") || lowerTxt.includes("denial of judgement") ||
+                lowerTxt.includes("input preparation failed") || lowerTxt.includes("running") ||
+                lowerTxt.includes("skipped") || lowerTxt.includes("pending") ||
+                lowerTxt.includes("in queue") || lowerTxt.includes("waiting") ||
+                lowerTxt.includes("judging") || lowerTxt.includes("network failed") ||
+                lowerTxt.includes("login failed") || lowerTxt.includes("submitted") ||
+                lowerTxt.includes("busy") || lowerTxt.includes("duplicate code") ||
+                lowerTxt.includes("dumplicate code") || lowerTxt.includes("source code error") ||
+                lowerTxt.includes("submit error") || lowerTxt.includes("problem unavailable");
 
             if (isConfirmedStatusContainer || isGreen || isRed || isOrange || isPurple || isBrightYellow || isDarkYellow || isGrey) {
                 let colorClass = "vjb-color-red";
@@ -481,7 +511,7 @@
                 }
             `;
             style.innerHTML = iframeCss;
-        } catch(e) {}
+        } catch (e) { }
     }
 
     function initIframeObserver() {
@@ -509,13 +539,13 @@
         try {
             const savedBg = await localDB.get('vjb_bgData');
             if (savedBg) currentBgData = savedBg;
-        } catch(e) {}
+        } catch (e) { }
         applySettings();
     }
 
     async function saveSettings() {
         GM_setValue('vjb_settings', settings);
-        try { await localDB.set('vjb_bgData', currentBgData); } catch(e) {}
+        try { await localDB.set('vjb_bgData', currentBgData); } catch (e) { }
         if (activeBgObjectURL) { URL.revokeObjectURL(activeBgObjectURL); activeBgObjectURL = ''; }
         applySettings();
     }
@@ -748,7 +778,7 @@
         if (!panel) createSettingsPanel();
         panel.classList.toggle('active');
 
-        if(panel.classList.contains('active')) {
+        if (panel.classList.contains('active')) {
             selectedFileData = currentBgData;
             document.getElementById('vjb-set-theme').value = settings.themeColor;
             document.getElementById('vjb-set-font-code').value = settings.fontCode;
@@ -759,7 +789,7 @@
             document.getElementById('vjb-op-val').innerText = Math.round(settings.opacity * 100) + '%';
 
             const radios = document.getElementsByName('bgType');
-            for(let r of radios) { if(r.value === settings.bgType) r.checked = true; }
+            for (let r of radios) { if (r.value === settings.bgType) r.checked = true; }
 
             const textEl = document.getElementById('vjb-drop-text');
             const infoEl = document.getElementById('vjb-file-info');

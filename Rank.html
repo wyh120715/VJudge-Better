@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        (function () {
+            try {
+                const storedTheme = localStorage.getItem('theme') || 'auto';
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const effectiveTheme = storedTheme === 'auto'
+                    ? (prefersDark ? 'dark' : 'light')
+                    : storedTheme;
+                document.documentElement.setAttribute('data-bs-theme', effectiveTheme);
+                document.documentElement.style.setProperty('color-scheme', effectiveTheme);
+            } catch (e) {
+            }
+        })();
+    </script>
+
+
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-374JLX1715"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-374JLX1715', {
+
+            'user_id': 'wyh120715'
+
+        });
+    </script>
+
+
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9098591903020457"
+        crossorigin="anonymous"></script>
+
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="keywords" content="Online Judge, vjudge, OJ, Virtual Judge, ICPC, OnlineJudge" />
+    <meta name="robots" content="index, follow" />
+
+    <title>CSP-S复习4_倍增 - Virtual Judge</title>
+
+    <meta property="og:url" content="https://vjudge.net/contest/829768" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="CSP-S复习4_倍增 - Virtual Judge" />
+    <meta property="og:description" content="Contest [CSP-S复习4_倍增] in Virtual Judge" />
+    <script defer src="/static/bundle/ec8ec55297d92d5fe8a0.js"></script>
+    <script defer src="/static/bundle/2ff0cf0eaf1c86e7d07c.js"></script>
+    <script defer src="/static/bundle/609850a616cd1cd1050e.js"></script>
+    <script defer src="/static/bundle/06988c0cb5f325797923.js"></script>
+    <script defer src="/static/bundle/f0ddc3b4b794191bce6d.js"></script>
+    <script defer src="/static/bundle/f8c74aa172b26c07a22b.js"></script>
+    <script defer src="/static/bundle/716f85e13f177dbf5e57.js"></script>
+    <script defer src="/static/bundle/1782ad6754f2ba5b2e05.js"></script>
+    <script defer src="/static/bundle/299406363a67bd8d3660.js"></script>
+    <script defer src="/static/bundle/b7373c012e1684ca87b5.js"></script>
+    <link href="/static/bundle/7dfcff63ee8a84ba4327.css" rel="stylesheet">
+    <link href="/static/bundle/558cf47dd4aa8a2db0b6.css" rel="stylesheet">
+    <link href="/static/bundle/b236573ab843bd819a66.css" rel="stylesheet">
+    <link href="/static/bundle/278c09e66e89cd092b4b.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <head>
+        <script defer src="/static/bundle/31d6cfe0d16ae931b73c.js"></script>
+    </head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark prod" id="top-nav">
+        <button class="navbar-toggler d-sm-none" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <a class="navbar-brand" href="/">
+                <img src="/static/bundle/11b24ab2156955d8f3fa.ico" height="30" />
+                <span data-i18n="top.nav.home"></span>
+            </a>
+            <ul class="navbar-nav top-nav-primary">
+                <li class="nav-item" id="nav-problem">
+                    <a class="nav-link" href="/problem" data-i18n="top.nav.problem"></a>
+                </li>
+                <li class="nav-item" id="nav-status">
+                    <a class="nav-link" href="/status" data-i18n="top.nav.status"></a>
+                </li>
+                <li class="nav-item" id="nav-contest">
+                    <a class="nav-link" href="/contest" data-i18n="top.nav.contest"></a>
+                </li>
+                <li class="nav-item" id="nav-workbook">
+                    <a class="nav-link" href="/workbook" data-i18n="top.nav.workbook"></a>
+                </li>
+                <li class="nav-item" id="nav-user">
+                    <a class="nav-link" href="/user" data-i18n="top.nav.user"></a>
+                </li>
+                <li class="nav-item" id="nav-group">
+                    <a class="nav-link" href="/group" data-i18n="top.nav.group"></a>
+                </li>
+                <li class="nav-item" id="nav-comment">
+                    <a class="nav-link" href="/comment" data-i18n="top.nav.forum"></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="helpDropdown"
+                        data-bs-toggle="dropdown" data-i18n="top.nav.help"></a>
+                    <div class="dropdown-menu dropdown-menu-start">
+                        <a class="dropdown-item" href="/article/2771">
+                            <i class="fa fa-question-circle-o"></i>
+                            <span data-i18n="top.nav.faq"></span>
+                        </a>
+                        <a class="dropdown-item" href="/article/97">
+                            <i class="fa fa-bug"></i>
+                            <span data-i18n="top.nav.bf"></span>
+                        </a>
+                        <a class="dropdown-item" href="/article/96">
+                            <i class="fa fa-lightbulb-o"></i>
+                            <span data-i18n="top.nav.suggestions"></span>
+                        </a>
+                        <a class="dropdown-item" href="javascript:void(0)" id="contact-us">
+                            <i class="fa fa-headphones"></i>
+                            <span data-i18n="top.nav.contact"></span>
+                        </a>
+                    </div>
+                </li>
+
+            </ul>
+            <ul class="navbar-nav top-nav-secondary ms-sm-auto">
+                <li class="nav-item top-nav-theme-item">
+                    <a class="nav-link" href="javascript:void(0)" id="switchTheme"></a>
+                </li>
+                <li class="nav-item dropdown top-nav-locale-item">
+                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="switchLocale"
+                        data-bs-toggle="dropdown" data-i18n="top.nav.locale"></a>
+                    <div class="dropdown-menu dropdown-menu-end switch-locale-dropdown"></div>
+                </li>
+
+
+                <li class="nav-item dropdown top-nav-user-item">
+                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="userNameDropdown"
+                        data-bs-toggle="dropdown">wyh120715</a>
+                    <div class="dropdown-menu dropdown-menu-end user-dropdown">
+                        <a class="dropdown-item" href="/user/wyh120715" data-i18n="top.nav.profile"></a>
+                        <a class="dropdown-item update-profile" href="javascript:void(0)"
+                            data-i18n="top.nav.update"></a>
+                        <a class="dropdown-item" href="/team/mine" data-i18n="team.mine"></a>
+                        <a class="dropdown-item message" href="/message" data-i18n="top.nav.message"></a>
+                    </div>
+                </li>
+                <li class="nav-item top-nav-logout-item">
+                    <a class="nav-link logout" href="javascript:void(0)" data-i18n="top.nav.logout"></a>
+                </li>
+
+
+
+            </ul>
+        </div>
+    </nav>
+    <div id="page-panel-toggle-slot"></div>
+
+
+    <div class="container-md" style="margin-top: 30px;">
+
+        <div class="row alert alert-info" id="contest-announcement" style="display: none;"></div>
+
+
+        <div class="row card" id="time-info">
+            <div class="row">
+                <div class="col-3 text-start">
+                    <b>
+                        <i18n>contest.view.begin</i18n>
+                        :
+                    </b>
+                    <span class="timestamp">1783671900000</span>
+                </div>
+                <div class="col-6 text-center">
+                    <h3>
+                        <i id="btn-favorite"></i>
+
+                        <img src="/static/bundle/bf2b66129c2d2acc0cc3.png" height="30" />
+
+
+                        CSP-S复习4_倍增
+                    </h3>
+                </div>
+                <div class="col-3 text-end">
+                    <b>
+                        <i18n>contest.view.end</i18n>
+                        :
+                    </b>
+                    <span class="timestamp">1784190300000</span>
+                </div>
+            </div>
+            <div class="row" id="contest-time-slider-container">
+                <div id="contest-time"></div>
+            </div>
+            <div class="row">
+                <div class="col-3 text-start" id="info-elapsed">
+                    <b>
+                        <i18n>contest.view.elapsed</i18n>
+                        :
+                    </b>
+                    <span class="elapsed" id="span-elapsed"></span>
+                </div>
+                <div class="col-6 text-center">
+                    <span id="info-running"></span>
+                    <span id="info-freeze" style="color: grey">
+                        (<i18n>contest.frozen</i18n>)
+                    </span>
+                </div>
+                <div class="col-3 text-end" id="info-remaining">
+                    <b>
+                        <i18n>contest.view.remaining</i18n>
+                        :
+                    </b>
+                    <span class="remaining" id="span-remaining"></span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist" id="contest-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#overview" section="overview" role="tab"
+                        data-i18n="contest.view.overview"></a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#problem" section="problem" role="tab"
+                        data-i18n="contest.view.problem"></a>
+                </li>
+
+
+
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#status" section="status" role="tab"
+                        data-i18n="contest.view.status"></a>
+                </li>
+
+
+
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#rank" section="rank" role="tab"
+                        data-i18n="contest.view.rank">
+                        <i class='fa fa-refresh fa-spin'></i>
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#discuss" section="discuss" role="tab"
+                        data-i18n="contest.view.discuss" rel="#discuss" data-disqus-identifier="contest/829768"></a>
+                </li>
+
+                <li class="ms-auto text-end">
+                    <div class="btn-group" role="group">
+
+                        <button type="button" class="btn btn-secondary" id="btn-preference"
+                            data-i18n="contest.view.preference"></button>
+
+
+
+                    </div>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane in active" id="overview" role="tabpanel">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <div id="contest_overview" class="container-fluid px-0">
+                        <div class="row contest-overview-layout">
+                            <aside class="col-lg-4">
+                                <section id="contest-overview-meta-panel" class="contest-overview-panel">
+                                    <h4 data-i18n="contest.view.metadata"></h4>
+                                    <div id="contest-meta"></div>
+                                </section>
+                            </aside>
+                            <main class="col-lg-8">
+                                <section class="contest-overview-panel contest-overview-description-panel">
+                                    <div class="contest-overview-panel-actions">
+                                        <a href="javascript:void(0)" id="contest-overview-text-edit-link"
+                                            class="contest-overview-text-edit-link">
+                                            <i class="fa fa-edit" aria-hidden="true"></i>
+                                            <span data-i18n="contest.view.edit_overview_text"></span>
+                                        </a>
+                                    </div>
+                                    <div id="contest-description" style="display: none"></div>
+                                    <div id="contest-description-ad" class="contest-description-ad"
+                                        style="display: none">
+                                        <ins class="adsbygoogle" style="display:block"
+                                            data-ad-client="ca-pub-9098591903020457" data-ad-slot="1011472145"
+                                            data-ad-format="auto" data-full-width-responsive="true"></ins>
+                                    </div>
+                                </section>
+                            </main>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="tab-pane" id="problem" role="tabpanel">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <div id="contest_problem" class="container-fluid px-0">
+                        <div id="contest-problem-list-view">
+                            <div class="table-responsive px-0">
+                                <table id="contest-problems" class="table table-striped table-bordered" cellspacing="0"
+                                    width="100%">
+                                    <thead></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="contest-problem-detail-view">
+                            <div class="page-panel-toggle-host d-none">
+                                <button type="button"
+                                    class="btn btn-outline-light page-panel-toggle contest-problem-panels-toggle d-none"
+                                    data-bs-toggle="offcanvas" data-bs-target="#prob-left-panel"
+                                    aria-controls="prob-left-panel">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="row fixed-left-panel-layout">
+                                <div class="offcanvas-md offcanvas-start problem-side-panel-column fixed-left-panel"
+                                    id="prob-left-panel" tabindex="-1" aria-labelledby="contest-problem-panels-title">
+                                    <div class="offcanvas-header d-md-none">
+                                        <h5 class="offcanvas-title" id="contest-problem-panels-title"
+                                            data-i18n="button.panels"></h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                                            data-bs-target="#prob-left-panel" aria-label="Close"></button>
+                                    </div>
+                                    <div class="offcanvas-body problem-side-panel-body">
+                                        <ul class="nav nav-pills problem-side-panel-section" id="problem-nav"></ul>
+
+                                        <div class="alert alert-danger problem-side-panel-alert" role="alert"
+                                            id="prob-alert" style="display: none"></div>
+
+                                        <div id="prob-operation" class="problem-side-panel-section">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <button type="button" class="btn btn-outline-primary"
+                                                        id="problem-submit"></button>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <a href="#" class="btn btn-secondary" id="btn-contest-status"
+                                                        data-i18n="contest.view.status">Status</a>
+                                                </div>
+                                                <div class="col-6">
+                                                    <a href="#" class="btn btn-secondary" id="btn-contest-my-status"
+                                                        data-i18n="contest.view.my_status">My Status</a>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <a href="#" class="btn btn-secondary" id="btn-contest-problem-pdf"
+                                                        target="_blank">
+                                                        <i class="fa fa-file-pdf-o"></i> PDF
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="prob-properties" class="problem-side-panel-section">
+                                            <dl class="card row"></dl>
+                                        </div>
+
+                                        <div id="update-statements-tips"
+                                            class="alert alert-info problem-side-panel-section"
+                                            style="display: none; font-size: 15px; margin-bottom: 0">
+                                            <i18n>contest.view.statement_selection_label</i18n>:
+                                        </div>
+
+                                        <div id="prob-descriptions" class="problem-side-panel-section">
+                                            <div class="list-group" id="prob-descs"></div>
+                                        </div>
+
+                                        <div class="row" style="margin-top: 20px">
+                                            <!-- Contest sidebar -->
+                                            <ins class="adsbygoogle" style="display:block"
+                                                data-ad-client="ca-pub-9098591903020457" data-ad-slot="9577100134"
+                                                data-ad-format="auto" data-full-width-responsive="true"></ins>
+                                            <script>
+                                                var ad_setter = setInterval(function () {
+                                                    if (document.getElementById('contest_problem').offsetParent !== null) {
+                                                        (adsbygoogle = window.adsbygoogle || []).push({});
+                                                        clearInterval(ad_setter);
+                                                    }
+                                                }, 1000);
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fixed-main-panel" id="prob-right-panel">
+                                    <div class="row">
+                                        <div id="prob-title-contest">
+                                            <h2 id="problem-title"></h2>
+                                            <span class="origin">
+                                                <a id="problem-origin" href="#" target="_blank"></a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row" id="frame-description-container"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="tab-pane" id="status" role="tabpanel">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <div id="contest_status" class="container-fluid px-0">
+                        <div id="right-panel">
+                            <input type="button" class="btn btn-secondary btn-md" id="refresh-all" value="Refresh"
+                                data-i18n="button.refresh" />
+                            <input type="button" class="btn btn-secondary btn-md" id="reset" data-i18n="button.reset" />
+                            <input type="button" class="btn btn-secondary btn-md" id="filter"
+                                data-i18n="button.filter" />
+                            <div class="table-responsive px-0">
+                                <table id="listStatus" class="table table-striped table-bordered" cellspacing="0"
+                                    width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th class="run-id d-none d-xl-table-cell">ID</th>
+                                            <th class="username">
+                                                <i18n>status.list.username</i18n><br />
+                                                <input type="text" id="un" name="un" class="search_text"
+                                                    style="width:100%" />
+                                            </th>
+                                            <th class="num">
+                                                <i18n>status.list.prob</i18n><br />
+                                                <select id="contest-status-num" name="num" class="form-select">
+                                                    <option value="-" data-i18n="all"></option>
+                                                </select>
+                                            </th>
+                                            <th class="status">
+                                                <i18n>status.list.result</i18n><br />
+                                                <select id="res" name="res" class="form-select">
+                                                    <option value="all" data-i18n="all"></option>
+                                                    <option value="AC" data-i18n="status.result.accepted"></option>
+                                                    <option value="PE" data-i18n="status.result.presentation_error">
+                                                    </option>
+                                                    <option value="WA" data-i18n="status.result.wrong_answer"></option>
+                                                    <option value="TLE" data-i18n="status.result.time_limit_exceeded">
+                                                    </option>
+                                                    <option value="MLE" data-i18n="status.result.memory_limit_exceeded">
+                                                    </option>
+                                                    <option value="OLE" data-i18n="status.result.output_limit_exceeded">
+                                                    </option>
+                                                    <option value="RE" data-i18n="status.result.runtime_error"></option>
+                                                    <option value="CE" data-i18n="status.result.compile_error"></option>
+                                                    <option value="JUDGE_FAILED" data-i18n="status.result.judge_failed">
+                                                    </option>
+                                                    <option value="SUBMIT_FAILED_PERM"
+                                                        data-i18n="status.result.unknown_error"></option>
+                                                    <option value="SUBMIT_FAILED_TEMP"
+                                                        data-i18n="status.result.submit_failed"></option>
+                                                    <option value="PENDING"
+                                                        data-i18n="status.result.queuing_and_judging"></option>
+                                                </select>
+                                            </th>
+                                            <th class="runtime">
+                                                <i18n>status.list.time</i18n><br>(ms)
+                                            </th>
+                                            <th class="memory">
+                                                <i18n>status.list.mem</i18n><br>(MB)
+                                            </th>
+                                            <th class="length d-none d-xl-table-cell">
+                                                <i18n>status.list.length</i18n>
+                                            </th>
+                                            <th class="language">
+                                                <i18n>status.list.lang</i18n><br />
+                                                <select name="language" id="language" class="form-select">
+                                                    <option value="" data-i18n="all"></option>
+
+                                                    <option value="C">C</option>
+
+                                                    <option value="CPP">C++</option>
+
+                                                    <option value="CSHARP">C#</option>
+
+                                                    <option value="D">D</option>
+
+                                                    <option value="GO">Go</option>
+
+                                                    <option value="HASKELL">Haskell</option>
+
+                                                    <option value="JAVA">Java</option>
+
+                                                    <option value="JAVASCRIPT">JavaScript</option>
+
+                                                    <option value="KOTLIN">Kotlin</option>
+
+                                                    <option value="LUA">Lua</option>
+
+                                                    <option value="OBJECTIVE_C">Objective-C</option>
+
+                                                    <option value="PASCAL">Pascal</option>
+
+                                                    <option value="PERL">Perl</option>
+
+                                                    <option value="PHP">PHP</option>
+
+                                                    <option value="PYTHON">Python</option>
+
+                                                    <option value="RUBY">Ruby</option>
+
+                                                    <option value="RUST">Rust</option>
+
+                                                    <option value="SCALA">Scala</option>
+
+                                                    <option value="SWIFT">Swift</option>
+
+                                                    <option value="OTHER">Other</option>
+
+                                                </select>
+                                            </th>
+                                            <th class="date">
+                                                <i18n>status.list.submit_time</i18n>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="tab-pane" id="rank" role="tabpanel">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <div id="contest_rank">
+                        <div class="table-responsive contest-rank-table-scroll" id="contest-rank-table-scroll">
+                            <table id="contest-rank-table" cellspacing="1"></table>
+                        </div>
+                        <div class="contest-rank-sticky-head" id="contest-rank-sticky-head"></div>
+                        <table id="contest-rank-table-export"></table>
+
+                        <div class="rank_tool">
+                            <i class="fa fa-line-chart fa-3x" id="img_time_chart" title="Time chart"></i>
+                        </div>
+
+                        <!-- Team info modal -->
+                        <div class="modal fade" id="teamInfoModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"></h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table table-striped table-bordered contest-info"></table>
+                                        <div class="rank-time-chart-layout">
+                                            <div id="rank-time-chart-tooltip" class="rank-time-chart-tooltip-panel">
+                                            </div>
+                                            <div id="rank-time-chart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="tab-pane" id="discuss" role="tabpanel">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <div id="contest_discuss"></div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+    </div>
+
+    <textarea style="display: none"
+        name="dataJson">{"id":829768,"title":"CSP-S复习4_倍增","type":1,"openness":2,"authStatus":2,"begin":1783671900000,"end":1784190300000,"freezeTime":1784190300000,"unfreezeTime":1784190300000,"enableFreeze":false,"createTime":1783671770000,"version":"2e2","started":true,"ended":false,"managerId":1249092,"managerName":"yiyeli_hongfan","groupShortName":"c2027","groupName":"C2027级信息竞赛团队","fav":false,"description":{},"problems":[{"pid":4108411,"title":"接竹竿","oj":"洛谷","probNum":"P10264","num":"A","enabledDescKeys":[366430780665698],"descBriefs":[{"key":366430780665698,"updateDate":"2026-07-02","version":1782980214000,"author":"System","authorKey":"main","type":"main","lang":"zh","langDisplay":"中文","official":true,"mainOfficial":true,"publicVisible":true,"remarks":"Initialization."}],"properties":[{"title":"time_limit","content":"1000 ms","spoiler":false},{"title":"mem_limit","content":"524288 kB","spoiler":false}],"weight":1,"submitMethods":[false,true,true]},{"pid":4148346,"title":"树上旅行","oj":"洛谷","probNum":"P13019","num":"B","enabledDescKeys":[406975059910604],"descBriefs":[{"key":406975059910604,"updateDate":"2026-07-10","version":1783673050000,"author":"System","authorKey":"main","type":"main","lang":"zh","langDisplay":"中文","official":true,"mainOfficial":true,"publicVisible":true,"remarks":"Initialization."}],"properties":[{"title":"time_limit","content":"1000 ms","spoiler":false},{"title":"mem_limit","content":"524288 kB","spoiler":false}],"weight":1,"submitMethods":[false,true,true]},{"pid":4054282,"title":"Swapity Swapity Swap S","oj":"洛谷","probNum":"P6148","num":"C","enabledDescKeys":[322304243667563],"descBriefs":[{"key":322304243667563,"updateDate":"2026-07-13","version":1783923492000,"author":"System","authorKey":"main","type":"main","lang":"zh","langDisplay":"中文","official":true,"mainOfficial":true,"publicVisible":true,"remarks":"Initialization."}],"properties":[{"title":"time_limit","content":"2000 ms","spoiler":false},{"title":"mem_limit","content":"256000 kB","spoiler":false}],"weight":1,"submitMethods":[false,true,true]},{"pid":4107174,"title":"Walking in Manhattan G","oj":"洛谷","probNum":"P10137","num":"D","enabledDescKeys":[371674073811583],"descBriefs":[{"key":371674073811583,"updateDate":"2026-07-04","version":1783155582000,"author":"System","authorKey":"main","type":"main","lang":"zh","langDisplay":"中文","official":true,"mainOfficial":true,"publicVisible":true,"remarks":"Initialization."}],"properties":[{"title":"time_limit","content":"2000 ms","spoiler":false},{"title":"mem_limit","content":"262144 kB","spoiler":false}],"weight":1,"submitMethods":[false,true,true]},{"pid":4054990,"title":"Surveillance","oj":"洛谷","probNum":"P6902","num":"E","enabledDescKeys":[403085509343061],"descBriefs":[{"key":403085509343061,"updateDate":"2025-08-11","version":1754915594000,"author":"Gemini","authorKey":"translator:1281310:zh","authorUserId":1281310,"type":"translator","statementKey":"zh","lang":"zh","langDisplay":"中文","official":false,"mainOfficial":false,"publicVisible":true,"avatarUrl":"https://cn.cravatar.com/avatar/868a7aa942cfcbdae9ff8bdd506c6729?d\u003drobohash","remarks":"[简体中文] translation by LLM (gemini-2.5-flash)"}],"properties":[{"title":"time_limit","content":"4000 ms","spoiler":false},{"title":"mem_limit","content":"1048576 kB","spoiler":false}],"weight":1,"submitMethods":[false,true,true]}],"problemsHash":"2e2a345bff40870c8d1430a238151afa","privatePeerContestIds":[],"enableTimeMachine":true,"sumTime":false,"penalty":0,"partialScore":true,"oneShot":false,"customizedWeight":false,"showPeers":false,"participantMode":0,"excludedFromRank":false,"participation":{"enabled":false,"canChange":false,"options":[{"type":"user","name":"wyh120715"}]},"clonedFromId":0}</textarea>
+
+    <head>
+        <script defer src="/static/bundle/31d6cfe0d16ae931b73c.js"></script>
+    </head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="body-footer">
+        <div style="margin-bottom: 8px">
+            <a href="/cdn-cgi/l/email-protection#fd948ed38893bd8c8cd39e9290" target="_blank">
+                <img src="/static/bundle/159d24b1b159c99a98e3.svg" />
+            </a>
+            <img src="/static/bundle/fdbb90aaddd32a5ab4ad.png" class="qq" data-bs-toggle="popover"
+                data-bs-placement="top" />
+            <a href="https://weibo.com/u/5340553087" target="_blank">
+                <img src="/static/bundle/aae271671b3d18e15b40.svg" />
+            </a>
+            <a href="https://space.bilibili.com/3056509/lists/3909505" target="_blank">
+                <img src="/static/bundle/ad1d62977bf56d0e0010.png" />
+            </a>
+            <a href="https://t.me/joinchat/Erw7nRGwXN3iSCoKguVW3w" target="_blank">
+                <img src="/static/bundle/7182da66feaf3e99632a.svg" />
+            </a>
+            <a href="https://www.facebook.com/virtualjudge/" target="_blank">
+                <img src="/static/bundle/c2687d1cf1f3e06984eb.svg" />
+            </a>
+        </div>
+        <div id="footer-info">
+            All Copyright Reserved © 2010-2026<br />
+            <span data-i18n="bottom.server_time"></span>: <span class="currentTimeTZ"></span>
+        </div>
+    </div>
+
+
+    <input name="systemVersion" type="hidden" value="1783909655879" />
+    <input name="gaId" type="hidden" value="G-374JLX1715" />
+
+    <input id="visitor_username" name="username" type="hidden" value="wyh120715" />
+    <input id="visitor_userId" name="userId" type="hidden" value="1130265" />
+    <input id="visitor_sup" name="sup" type="hidden" value="0" />
+    <input id="newMessage" name="newMessage" type="hidden" value="false" />
+
+
+
+
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script type="text/javascript">basePath = "";</script>
+
+
+    <script defer
+        src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496"
+        integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ=="
+        data-cf-beacon='{"version":"2024.11.0","token":"cbda702c6a634090aafa4717574879a5","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

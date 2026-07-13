@@ -1,0 +1,393 @@
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  (function () {
+    try {
+      const storedTheme = localStorage.getItem('theme') || 'auto';
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const effectiveTheme = storedTheme === 'auto'
+          ? (prefersDark ? 'dark' : 'light')
+          : storedTheme;
+      document.documentElement.setAttribute('data-bs-theme', effectiveTheme);
+      document.documentElement.style.setProperty('color-scheme', effectiveTheme);
+    } catch (e) {
+    }
+  })();
+</script>
+
+
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-374JLX1715"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-374JLX1715', {
+      
+        'user_id': 'wyh120715'
+      
+    });
+  </script>
+
+
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9098591903020457" crossorigin="anonymous"></script>
+
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="keywords" content="Online Judge, vjudge, OJ, Virtual Judge, ICPC, OnlineJudge"/>
+<meta name="robots" content="index, follow"/>
+
+    <title data-i18n="page_title.status_list"
+           data-i18n-arg-site="Virtual Judge">Status - Virtual Judge</title>
+<script defer src="/static/bundle/ec8ec55297d92d5fe8a0.js"></script><script defer src="/static/bundle/2ff0cf0eaf1c86e7d07c.js"></script><script defer src="/static/bundle/609850a616cd1cd1050e.js"></script><script defer src="/static/bundle/06988c0cb5f325797923.js"></script><script defer src="/static/bundle/f8c74aa172b26c07a22b.js"></script><script defer src="/static/bundle/716f85e13f177dbf5e57.js"></script><script defer src="/static/bundle/1782ad6754f2ba5b2e05.js"></script><script defer src="/static/bundle/860ef96f5a4f59d2b7b7.js"></script><link href="/static/bundle/7dfcff63ee8a84ba4327.css" rel="stylesheet"><link href="/static/bundle/558cf47dd4aa8a2db0b6.css" rel="stylesheet"><link href="/static/bundle/b236573ab843bd819a66.css" rel="stylesheet"><link href="/static/bundle/4c049fadc2d947783ab1.css" rel="stylesheet"></head>
+
+<body>
+<head><script defer src="/static/bundle/31d6cfe0d16ae931b73c.js"></script></head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark prod" id="top-nav">
+    <button class="navbar-toggler d-sm-none" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+        <a class="navbar-brand" href="/">
+            <img src="/static/bundle/11b24ab2156955d8f3fa.ico" height="30"/>
+            <span data-i18n="top.nav.home"></span>
+        </a>
+        <ul class="navbar-nav top-nav-primary">
+            <li class="nav-item" id="nav-problem">
+                <a class="nav-link" href="/problem" data-i18n="top.nav.problem"></a>
+            </li>
+            <li class="nav-item" id="nav-status">
+                <a class="nav-link" href="/status" data-i18n="top.nav.status"></a>
+            </li>
+            <li class="nav-item" id="nav-contest">
+                <a class="nav-link" href="/contest" data-i18n="top.nav.contest"></a>
+            </li>
+            <li class="nav-item" id="nav-workbook">
+                <a class="nav-link" href="/workbook" data-i18n="top.nav.workbook"></a>
+            </li>
+            <li class="nav-item" id="nav-user">
+                <a class="nav-link" href="/user" data-i18n="top.nav.user"></a>
+            </li>
+            <li class="nav-item" id="nav-group">
+                <a class="nav-link" href="/group" data-i18n="top.nav.group"></a>
+            </li>
+            <li class="nav-item" id="nav-comment">
+                <a class="nav-link" href="/comment" data-i18n="top.nav.forum"></a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="helpDropdown" data-bs-toggle="dropdown" data-i18n="top.nav.help"></a>
+                <div class="dropdown-menu dropdown-menu-start">
+                    <a class="dropdown-item" href="/article/2771">
+                        <i class="fa fa-question-circle-o"></i>
+                        <span data-i18n="top.nav.faq"></span>
+                    </a>
+                    <a class="dropdown-item" href="/article/97">
+                        <i class="fa fa-bug"></i>
+                        <span data-i18n="top.nav.bf"></span>
+                    </a>
+                    <a class="dropdown-item" href="/article/96">
+                        <i class="fa fa-lightbulb-o"></i>
+                        <span data-i18n="top.nav.suggestions"></span>
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" id="contact-us">
+                        <i class="fa fa-headphones"></i>
+                        <span data-i18n="top.nav.contact"></span>
+                    </a>
+                </div>
+            </li>
+            
+        </ul>
+        <ul class="navbar-nav top-nav-secondary ms-sm-auto">
+            <li class="nav-item top-nav-theme-item">
+                <a class="nav-link" href="javascript:void(0)" id="switchTheme"></a>
+            </li>
+            <li class="nav-item dropdown top-nav-locale-item">
+                <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="switchLocale" data-bs-toggle="dropdown" data-i18n="top.nav.locale"></a>
+                <div class="dropdown-menu dropdown-menu-end switch-locale-dropdown"></div>
+            </li>
+            
+                
+                    <li class="nav-item dropdown top-nav-user-item">
+                        <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="userNameDropdown" data-bs-toggle="dropdown">wyh120715</a>
+                        <div class="dropdown-menu dropdown-menu-end user-dropdown">
+                            <a class="dropdown-item" href="/user/wyh120715" data-i18n="top.nav.profile"></a>
+                            <a class="dropdown-item update-profile" href="javascript:void(0)" data-i18n="top.nav.update"></a>
+                            <a class="dropdown-item" href="/team/mine" data-i18n="team.mine"></a>
+                            <a class="dropdown-item message" href="/message" data-i18n="top.nav.message"></a>
+                        </div>
+                    </li>
+                    <li class="nav-item top-nav-logout-item">
+                        <a class="nav-link logout" href="javascript:void(0)" data-i18n="top.nav.logout"></a>
+                    </li>
+                
+                
+            
+        </ul>
+    </div>
+</nav>
+<div id="page-panel-toggle-slot"></div>
+
+
+<div class="page-panel-toggle-host d-none">
+    <button type="button"
+            class="btn btn-outline-light page-panel-toggle list-panels-toggle d-none"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#left-panel"
+            aria-controls="left-panel">
+        <i class="fa fa-bars" aria-hidden="true"></i>
+    </button>
+</div>
+
+<div class="container-fluid" id="status_list_container" style="margin-top: 30px;">
+    <div class="row fixed-left-panel-layout">
+        <div class="offcanvas-md offcanvas-start list-side-panel-column fixed-left-panel"
+             id="left-panel"
+             tabindex="-1"
+             aria-labelledby="status-list-panels-title">
+            <div class="offcanvas-header d-md-none">
+                <h5 class="offcanvas-title" id="status-list-panels-title" data-i18n="button.panels"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#left-panel" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body list-side-panel-body">
+            <div class="list-group" id="status-owner">
+                <a href="javascript:void(0)" class="list-group-item" data-owner="all">
+                    <i18n>all</i18n>
+                </a>
+                <a href="javascript:void(0)" class="list-group-item" data-owner="mine">
+                    <i18n>status.list.mine</i18n>
+                </a>
+                <a href="javascript:void(0)" class="list-group-item" data-owner="followed">
+                    <i18n>status.list.followed</i18n>
+                </a>
+                <input type="hidden" name="owner" value=""/>
+            </div>
+            <div style="margin-top: 20px;">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-9098591903020457"
+                     data-ad-slot="5496840117"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                  (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            </div>
+        </div>
+        <div class="fixed-main-panel" id="right-panel">
+            <input type="button" class="btn btn-secondary btn-md" id="filter" data-i18n="button.filter" />
+            <input type="button" class="btn btn-secondary btn-md" id="reset" data-i18n="button.reset" />
+            <input type="button" class="btn btn-secondary btn-md" id="refresh-all" data-i18n="button.refresh" style="display: none"/>
+            <div class="table-responsive">
+                <table id="listStatus" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th class="username">
+                            <i18n>status.list.username</i18n><br/>
+                            <input type="text" id="un" name="un" class="search_text" style="width:100%"/>
+                        </th>
+                        <th class="oj">
+                            OJ<br/>
+                            <input type="text" id="OJId" name="OJId" class="search_text"/>
+                        </th>
+                        <th class="prob_num">
+                            <i18n>status.list.prob</i18n><br/>
+                            <input type="text" id="probNum" name="probNum" class="search_text" style="width:100%"/>
+                        </th>
+                        <th class="contest_num"></th>
+                        <th class="status">
+                            <i18n>status.list.result</i18n><br/>
+                            <select id="res" name="res" class="form-select">
+                                <option value="all" data-i18n="all"></option>
+                                <option value="AC" data-i18n="status.result.accepted"></option>
+                                <option value="PE" data-i18n="status.result.presentation_error"></option>
+                                <option value="WA" data-i18n="status.result.wrong_answer"></option>
+                                <option value="TLE" data-i18n="status.result.time_limit_exceeded"></option>
+                                <option value="MLE" data-i18n="status.result.memory_limit_exceeded"></option>
+                                <option value="OLE" data-i18n="status.result.output_limit_exceeded"></option>
+                                <option value="RE" data-i18n="status.result.runtime_error"></option>
+                                <option value="CE" data-i18n="status.result.compile_error"></option>
+                                <option value="JUDGE_FAILED" data-i18n="status.result.judge_failed"></option>
+                                <option value="SUBMIT_FAILED_PERM" data-i18n="status.result.unknown_error"></option>
+                                <option value="SUBMIT_FAILED_TEMP" data-i18n="status.result.submit_failed"></option>
+                                <option value="PENDING" data-i18n="status.result.queuing_and_judging"></option>
+                            </select>
+                        </th>
+                        <th class="runtime">
+                            <i18n>status.list.time</i18n><br>(ms)
+                        </th>
+                        <th class="memory">
+                            <i18n>status.list.mem</i18n><br>(MB)
+                        </th>
+                        <th class="length">
+                            <i18n>status.list.length</i18n>
+                        </th>
+                        <th class="language">
+                            <i18n>status.list.lang</i18n><br/>
+                            <select name="language" id="language" class="form-select">
+                                <option value="" data-i18n="all"></option>
+                                
+                                    <option value="C">C</option>
+                                
+                                    <option value="CPP">C++</option>
+                                
+                                    <option value="CSHARP">C#</option>
+                                
+                                    <option value="D">D</option>
+                                
+                                    <option value="GO">Go</option>
+                                
+                                    <option value="HASKELL">Haskell</option>
+                                
+                                    <option value="JAVA">Java</option>
+                                
+                                    <option value="JAVASCRIPT">JavaScript</option>
+                                
+                                    <option value="KOTLIN">Kotlin</option>
+                                
+                                    <option value="LUA">Lua</option>
+                                
+                                    <option value="OBJECTIVE_C">Objective-C</option>
+                                
+                                    <option value="PASCAL">Pascal</option>
+                                
+                                    <option value="PERL">Perl</option>
+                                
+                                    <option value="PHP">PHP</option>
+                                
+                                    <option value="PYTHON">Python</option>
+                                
+                                    <option value="RUBY">Ruby</option>
+                                
+                                    <option value="RUST">Rust</option>
+                                
+                                    <option value="SCALA">Scala</option>
+                                
+                                    <option value="SWIFT">Swift</option>
+                                
+                                    <option value="OTHER">Other</option>
+                                
+                            </select>
+                        </th>
+                        <th class="date">
+                            <i18n>status.list.submit_time</i18n>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<head><script defer src="/static/bundle/31d6cfe0d16ae931b73c.js"></script></head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="body-footer">
+    <div style="margin-bottom: 8px">
+        <a href="/cdn-cgi/l/email-protection#3c554f1249527c4d4d125f5351" target="_blank">
+            <img src="/static/bundle/159d24b1b159c99a98e3.svg"/>
+        </a>
+        <img src="/static/bundle/fdbb90aaddd32a5ab4ad.png" class="qq" data-bs-toggle="popover" data-bs-placement="top"/>
+        <a href="https://weibo.com/u/5340553087" target="_blank">
+            <img src="/static/bundle/aae271671b3d18e15b40.svg"/>
+        </a>
+        <a href="https://space.bilibili.com/3056509/lists/3909505" target="_blank">
+            <img src="/static/bundle/ad1d62977bf56d0e0010.png"/>
+        </a>
+        <a href="https://t.me/joinchat/Erw7nRGwXN3iSCoKguVW3w" target="_blank">
+            <img src="/static/bundle/7182da66feaf3e99632a.svg"/>
+        </a>
+        <a href="https://www.facebook.com/virtualjudge/" target="_blank">
+            <img src="/static/bundle/c2687d1cf1f3e06984eb.svg"/>
+        </a>
+    </div>
+    <div id="footer-info">
+        All Copyright Reserved © 2010-2026<br/>
+        <span data-i18n="bottom.server_time"></span>: <span class="currentTimeTZ"></span>
+    </div>
+</div>
+
+
+<input name="systemVersion" type="hidden" value="1783909655879"/>
+<input name="gaId" type="hidden" value="G-374JLX1715"/>
+
+    <input id="visitor_username" name="username" type="hidden" value="wyh120715"/>
+    <input id="visitor_userId" name="userId" type="hidden" value="1130265"/>
+    <input id="visitor_sup" name="sup" type="hidden" value="0"/>
+    <input id="newMessage" name="newMessage" type="hidden" value="false"/>
+
+
+
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">basePath = "";</script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"cbda702c6a634090aafa4717574879a5","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
