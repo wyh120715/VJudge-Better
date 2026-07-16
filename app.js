@@ -149,6 +149,12 @@
         .bg-primary { background-color: var(--vjb-theme, #4a90e2) !important; }
         .border-primary { border-color: var(--vjb-theme, #4a90e2) !important; }
 
+        /* 仅在比赛概览卡片处映射主色调，使其跟随主题色，避免污染全局倒计时/时间等组件 */
+        .contest-meta-section, .contest-meta-section-title {
+            --color-primary: var(--vjb-theme) !important;
+            --bs-primary: var(--vjb-theme) !important;
+        }
+
         .navbar-nav .nav-link, .nav-tabs .nav-link, .contest-problem-menu .nav-link, .btn-link { position: relative; overflow: hidden; color: var(--vjb-text-muted) !important; transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important; }
         .navbar-nav .nav-link:hover, .nav-tabs .nav-link:hover, .contest-problem-menu .nav-link:hover { color: var(--vjb-theme, #4a90e2) !important; }
         .navbar-nav .active > .nav-link, .navbar-nav .nav-link.active, .nav-tabs .nav-link.active, .contest-problem-menu .nav-link.active { border-bottom: none !important; background: transparent !important; color: var(--vjb-theme, #4a90e2) !important; font-weight: bold !important; }
@@ -400,7 +406,7 @@
 
     // ================= 💡 全息状态流自适应多维分色计算引擎 =================
     function processStatusTextElements() {
-        const selectors = '#listStatus tbody td.status, #listStatus tbody td.status .view-solution, .status .view-solution, .status > span, table tbody td';
+        const selectors = '#listStatus tbody td.status .view-solution, #listStatus tbody td.status > span, #listStatus tbody td.status > a, .status .view-solution, .status > span, table tbody td';
         const elements = document.querySelectorAll(selectors);
 
         elements.forEach(el => {
@@ -408,22 +414,41 @@
             if (el.closest('.language') || el.classList.contains('language')) return;
             if (el.closest('.runtime') || el.closest('.memory') || el.closest('.length')) return;
 
+            // 跳过 td 元素本身 —— 直接对 td 应用 flex 会破坏表格列对齐
+            // badge 样式只应用在 td 内部的子元素上
+            if (el.tagName === 'TD') {
+                const table = el.closest('table');
+                if (!table) return;
+                const ths = Array.from(table.querySelectorAll('th'));
+                const resIndex = ths.findIndex(th => th.textContent.includes('评测结果') || th.getAttribute('data-i18n') === 'status.list.result');
+                if (resIndex === -1) return;
+                const tr = el.closest('tr');
+                if (!tr || tr.children[resIndex] !== el) return;
+
+                // 若 td 内已有 .view-solution，交由该元素自身的选择器分支处理，避免双重嵌套
+                if (el.querySelector('.view-solution')) return;
+
+                // 找到或创建内部包装 span 用于挂 badge（仅针对纯文本内容的 td）
+                let inner = el.querySelector('.vjb-status-inner');
+                if (!inner) {
+                    inner = document.createElement('span');
+                    inner.className = 'vjb-status-inner';
+                    while (el.firstChild) {
+                        inner.appendChild(el.firstChild);
+                    }
+                    el.appendChild(inner);
+                }
+                el = inner;
+            }
+
             let isConfirmedStatusContainer = false;
 
             if (el.closest('#listStatus tbody td.status')) {
                 isConfirmedStatusContainer = true;
             } else if (el.classList.contains('view-solution') && !el.closest('.language')) {
                 isConfirmedStatusContainer = true;
-            } else if (el.tagName === 'TD' && el.closest('table')) {
-                const table = el.closest('table');
-                const ths = Array.from(table.querySelectorAll('th'));
-                const resIndex = ths.findIndex(th => th.textContent.includes('评测结果') || th.getAttribute('data-i18n') === 'status.list.result');
-                if (resIndex !== -1) {
-                    const tr = el.closest('tr');
-                    if (tr && tr.children[resIndex] === el) {
-                        isConfirmedStatusContainer = true;
-                    }
-                }
+            } else if (el.classList.contains('vjb-status-inner')) {
+                isConfirmedStatusContainer = true;
             }
 
             let txt = el.textContent ? el.textContent.trim() : "";
@@ -553,7 +578,8 @@
     function applySettings() {
         const root = document.documentElement;
         root.style.setProperty('--vjb-opacity', settings.opacity);
-        root.style.setProperty('--vjb-theme', settings.themeColor || '#4a90e2');
+        const themeColor = settings.themeColor || '#4a90e2';
+        root.style.setProperty('--vjb-theme', themeColor);
 
         let fontStyleEl = document.getElementById('vjb-global-fonts');
         if (!fontStyleEl) {

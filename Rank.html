@@ -1,7 +1,5 @@
-<!DOCTYPE html>
-<html>
-
-<head>
+<html data-bs-theme="dark" style="color-scheme: dark; --vjb-opacity: 0.85; --vjb-theme: #4be2bc; --bs-primary-rgb: 75, 226, 188;"><head>
+    
 
 
 
@@ -19,76 +17,397 @@
 
 
 
+<script>
+  (function () {
+    try {
+      const storedTheme = localStorage.getItem('theme') || 'auto';
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const effectiveTheme = storedTheme === 'auto'
+          ? (prefersDark ? 'dark' : 'light')
+          : storedTheme;
+      document.documentElement.setAttribute('data-bs-theme', effectiveTheme);
+      document.documentElement.style.setProperty('color-scheme', effectiveTheme);
+    } catch (e) {
+    }
+  })();
+</script>
 
-    <script>
-        (function () {
-            try {
-                const storedTheme = localStorage.getItem('theme') || 'auto';
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const effectiveTheme = storedTheme === 'auto'
-                    ? (prefersDark ? 'dark' : 'light')
-                    : storedTheme;
-                document.documentElement.setAttribute('data-bs-theme', effectiveTheme);
-                document.documentElement.style.setProperty('color-scheme', effectiveTheme);
-            } catch (e) {
+
+
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-374JLX1715"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-374JLX1715', {
+      
+        'user_id': 'wyh120715'
+      
+    });
+  </script>
+
+
+
+    <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9098591903020457" crossorigin="anonymous"></script>
+
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="keywords" content="Online Judge, vjudge, OJ, Virtual Judge, ICPC, OnlineJudge">
+<meta name="robots" content="index, follow">
+
+    <title>线段树优化建图2 - Virtual Judge</title>
+
+    <meta property="og:url" content="https://vjudge.net/contest/831453">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="线段树优化建图2 - Virtual Judge">
+    <meta property="og:description" content="Contest [线段树优化建图2] in Virtual Judge">
+<script defer="" src="/static/bundle/ec8ec55297d92d5fe8a0.js"></script><script defer="" src="/static/bundle/2ff0cf0eaf1c86e7d07c.js"></script><script defer="" src="/static/bundle/609850a616cd1cd1050e.js"></script><script defer="" src="/static/bundle/06988c0cb5f325797923.js"></script><script defer="" src="/static/bundle/185fdb2760a0b8f1970f.js"></script><script defer="" src="/static/bundle/e9a7d95223a96f7a0ef2.js"></script><script defer="" src="/static/bundle/f0ddc3b4b794191bce6d.js"></script><script defer="" src="/static/bundle/67dbaac1061358cacda3.js"></script><script defer="" src="/static/bundle/c620dc45ae33483be417.js"></script><script defer="" src="/static/bundle/3aff656bef1205833243.js"></script><script defer="" src="/static/bundle/a8919cea266aa9f619a1.js"></script><script defer="" src="/static/bundle/4c36acfb5b4a4a30cfe8.js"></script><link href="/static/bundle/7dfcff63ee8a84ba4327.css" rel="stylesheet"><link href="/static/bundle/558cf47dd4aa8a2db0b6.css" rel="stylesheet"><link href="/static/bundle/b236573ab843bd819a66.css" rel="stylesheet"><link href="/static/bundle/7979526e41a63b140742.css" rel="stylesheet"><link href="/static/bundle/9fc78d3180912ede6e7b.css" rel="stylesheet"><style>
+        :root {
+            --vjb-fallback-bg: #f8f9fa;
+            --vjb-hover-bg: rgba(0, 0, 0, 0.04);
+            --vjb-card-bg: rgba(255, 255, 255, 0.72);
+            --vjb-card-border: rgba(0, 0, 0, 0.08);
+            --vjb-btn-sec-bg: transparent;
+            --vjb-text-main: #212529;
+            --vjb-text-muted: #5c636a;
+            --vjb-cell-bg: rgba(255, 255, 255, 0.4);
+            --color-primary: var(--vjb-theme) !important;
+            --bs-primary: var(--vjb-theme) !important;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --vjb-fallback-bg: #141414;
+                --vjb-hover-bg: rgba(255, 255, 255, 0.06);
+                --vjb-card-bg: rgba(25, 20, 20, 0.55);
+                --vjb-card-border: rgba(255, 255, 255, 0.08);
+                --vjb-btn-sec-bg: rgba(255, 255, 255, 0.04);
+                --vjb-text-main: #eeeeee;
+                --vjb-text-muted: #aaaaaa;
+                --vjb-cell-bg: rgba(0, 0, 0, 0.2);
             }
-        })();
-    </script>
+        }
+        html[data-bs-theme='dark'], html[data-theme='dark'], body.dark, .dark-mode, [theme='dark'] {
+            --vjb-fallback-bg: #141414 !important;
+            --vjb-hover-bg: rgba(255, 255, 255, 0.06) !important;
+            --vjb-card-bg: rgba(25, 20, 20, 0.55) !important;
+            --vjb-card-border: rgba(255, 255, 255, 0.08) !important;
+            --vjb-btn-sec-bg: rgba(255, 255, 255, 0.04) !important;
+            --vjb-text-main: #eeeeee !important;
+            --vjb-text-muted: #aaaaaa !important;
+            --vjb-cell-bg: rgba(0, 0, 0, 0.2) !important;
+        }
+        html[data-bs-theme='light'] {
+            --vjb-fallback-bg: #f8f9fa !important;
+            --vjb-hover-bg: rgba(0, 0, 0, 0.04) !important;
+            --vjb-card-bg: rgba(255, 255, 255, 0.72) !important;
+            --vjb-card-border: rgba(0, 0, 0, 0.08) !important;
+            --vjb-btn-sec-bg: transparent !important;
+            --vjb-text-main: #212529 !important;
+            --vjb-text-muted: #5c636a !important;
+            --vjb-cell-bg: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        body { background: transparent !important; }
+        body, div, span, a, button, input, li, ul, .nav-slider { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        #vjb-bg-container, #vjb-bg-image, #vjb-bg-video, .vjb-nav-slider, img, svg, i, [class*="icon"], [class*="fa"], [class*="glyphicon"], table, tr, td, th { transition: none !important; }
+        #contest-rank-table *, #listStatus * { transition: none !important; }
+
+        #vjb-bg-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -9999; pointer-events: none; overflow: hidden; background: var(--vjb-fallback-bg); }
+        #vjb-bg-image, #vjb-bg-video { width: 100%; height: 100%; object-fit: cover; opacity: var(--vjb-opacity, 0.85); transition: opacity 0.5s ease; }
+
+        /* 全局基础组件圆滑矩形化 */
+        #problem-submit, .btn-primary, .btn-check:checked + .btn, .btn-check:checked + .btn-primary, .btn-check:checked + .btn-outline-primary, .btn-group > .btn.active, .btn-group > .btn:active, .nav-pills .nav-link.active, .nav-pills > li.active > a {
+            background-color: var(--vjb-theme, #4a90e2) !important; border-color: var(--vjb-theme, #4a90e2) !important; background-image: none !important; color: #ffffff !important; border-radius: 6px !important;
+        }
+        #problem-submit.btn-outline-primary, .btn-outline-primary { color: var(--vjb-theme, #4a90e2) !important; border-color: var(--vjb-theme, #4a90e2) !important; background-color: transparent !important; border-radius: 6px !important; }
+        #problem-submit.btn-outline-primary:hover, .btn-outline-primary:hover { background-color: var(--vjb-theme, #4a90e2) !important; color: #ffffff !important; }
+        .pagination .active .page-link, .pagination .page-item.active .page-link, .page-link.active { background-color: var(--vjb-theme, #4a90e2) !important; border-color: var(--vjb-theme, #4a90e2) !important; color: #ffffff !important; }
+        .pagination .page-item .page-link { border-radius: 6px !important; margin: 0 2px; }
+
+        .badge { border-radius: 4px !important; }
+        .form-select, .search_text, input[type="text"] { border-radius: 6px !important; border: 1px solid var(--vjb-card-border) !important; }
+        .badge.text-bg-primary, .badge.bg-primary { background-color: var(--vjb-theme, #4a90e2) !important; color: #ffffff !important; border: none !important; }
+        .badge.border-primary, .badge.text-primary, .statement-badge-lang { border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme, #4a90e2) !important; background-color: transparent !important; }
+        .problem-description-item.active .statement-badge { border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme, #4a90e2) !important; }
+
+        .text-primary { color: var(--vjb-theme, #4a90e2) !important; }
+        #info-running.text-primary { color: #0d6efd !important; }
+        .bg-primary { background-color: var(--vjb-theme, #4a90e2) !important; }
+        .border-primary { border-color: var(--vjb-theme, #4a90e2) !important; }
+
+        .navbar-nav .nav-link, .nav-tabs .nav-link, .contest-problem-menu .nav-link, .btn-link { position: relative; overflow: hidden; color: var(--vjb-text-muted) !important; transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important; }
+        .navbar-nav .nav-link:hover, .nav-tabs .nav-link:hover, .contest-problem-menu .nav-link:hover { color: var(--vjb-theme, #4a90e2) !important; }
+        .navbar-nav .active > .nav-link, .navbar-nav .nav-link.active, .nav-tabs .nav-link.active, .contest-problem-menu .nav-link.active { border-bottom: none !important; background: transparent !important; color: var(--vjb-theme, #4a90e2) !important; font-weight: bold !important; }
+
+        .nav-pills .nav-link:not(.active), #problem-nav .nav-link:not(.active) { color: var(--vjb-text-muted) !important; background: transparent !important; font-weight: 500 !important; }
+        .nav-pills .nav-link:not(.active):hover, #problem-nav .nav-link:not(.active):hover { color: var(--vjb-theme, #4a90e2) !important; background-color: var(--vjb-hover-bg) !important; }
+
+        #prob-operation .btn-secondary, #buttonContainer .btn-secondary, #right-panel .btn-secondary { background-color: var(--vjb-btn-sec-bg) !important; border: 1px solid var(--vjb-card-border) !important; color: var(--vjb-text-muted) !important; box-shadow: none !important; border-radius: 6px !important; }
+        #prob-operation .btn-secondary:hover, #buttonContainer .btn-secondary:hover, #right-panel .btn-secondary:hover { border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme, #4a90e2) !important; background-color: var(--vjb-hover-bg) !important; box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important; }
+        .list-group-item.active { background-color: var(--vjb-hover-bg) !important; border: 1px solid var(--vjb-card-border) !important; border-left: 4px solid var(--vjb-theme, #4a90e2) !important; color: var(--vjb-text-main) !important; box-shadow: none !important; }
+        .list-group-item.active .statement-author-row a, .list-group-item.active .statement-author-row span { color: var(--vjb-theme, #4a90e2) !important; font-weight: bold !important; }
+
+        #time-info { background: var(--vjb-card-bg) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important; border: 1px solid var(--vjb-card-border) !important; border-radius: 14px !important; padding: 15px 20px !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important; margin-bottom: 20px !important; color: var(--vjb-text-main) !important; }
+        #time-info h3 { color: var(--vjb-text-main) !important; }
+        .contest-time-progress { background-color: var(--vjb-theme, #4a90e2) !important; box-shadow: 0 0 12px var(--vjb-theme, #4a90e2); border-radius: 4px !important; }
+        #contest-time.noUi-target { background-color: rgba(128, 128, 128, 0.15) !important; border: none !important; height: 6px !important; border-radius: 4px !important; }
+        .noUi-handle { width: 16px !important; height: 16px !important; right: -8px !important; top: -5px !important; background-color: #ffffff !important; border: 3px solid var(--vjb-theme, #4a90e2) !important; border-radius: 50% !important; box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important; cursor: pointer !important; transition: transform 0.2s !important; }
+        .noUi-handle:hover { transform: scale(1.25); }
+        .noUi-handle::before, .noUi-handle::after { display: none !important; }
+
+        /* ========== 💡 统一回归无边界分离晶格格式 ========== */
+        table.table, #contest-rank-table, #listStatus, #group-featured-articles-table, #group-contest-table, #group-member-table {
+            width: 100% !important;
+            border-collapse: separate !important;
+            border-spacing: 2px 2px !important;
+            background-color: var(--vjb-card-bg) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid var(--vjb-card-border) !important;
+            border-radius: 8px !important;
+            padding: 4px !important;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06) !important;
+            margin-top: 15px !important;
+        }
+        #listStatus {
+            table-layout: auto !important;
+        }
+
+        /* 💡 强制所有表头居中修复 */
+        table.table thead tr, #contest-rank-table thead tr, #listStatus thead tr { background: transparent !important; }
+
+        table.table th, #contest-rank-table th, #listStatus th, th {
+            font-weight: 700 !important;
+            color: var(--vjb-text-main) !important;
+            padding: 8px 6px !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+            border: none !important;
+            border-bottom: 2px solid var(--vjb-card-border) !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        #contest-rank-table th {
+            padding: 6px 2px !important;
+            height: auto !important;
+            min-height: 0 !important;
+        }
+
+        table.table th *, #contest-rank-table th *, #listStatus th * {
+            text-align: center !important;
+        }
+
+        /* 修复 VJudge 的独立包裹的嵌套导致的错位，让它排列整齐居中，并且靠拢 */
+        #contest-rank-table th div {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        #contest-rank-table th div * {
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1.0 !important;
+            display: inline-block !important;
+            text-align: center !important;
+        }
+        #contest-rank-table th br {
+            display: none !important;
+        }
+
+        table.table td, #contest-rank-table td, #listStatus td {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border-radius: 4px !important; /* 晶格小圆角 */
+            box-shadow: none !important;
+            border: none !important;
+            /* 绝对使用 background-color 防止进度条图层被覆盖 */
+            background-color: var(--vjb-cell-bg) !important;
+            padding: 8px 6px !important;
+            vertical-align: middle !important;
+            text-align: center !important; /* 强制所有数据居中 */
+            white-space: nowrap !important;
+        }
+        #contest-rank-table td {
+            padding: 6px 2px !important;
+        }
+
+        table.table tbody tr:hover td, #contest-rank-table tbody tr:not(.myself):not(.my-team):hover td, #listStatus tbody tr:hover td {
+            background-color: var(--vjb-hover-bg) !important;
+        }
+
+        /* 个别名称的左对齐保护（防拥挤） */
+        table.table td.team, #contest-rank-table td.team, table.table td.prob-title, table.table td.title {
+            text-align: left !important;
+            padding-left: 10px !important;
+        }
+        table.table th.team, #contest-rank-table th.team, table.table th.prob-title, table.table th.title {
+            text-align: left !important;
+            padding-left: 10px !important;
+        }
+        table.table th.team *, #contest-rank-table th.team *, table.table th.prob-title *, table.table th.title * {
+            text-align: left !important;
+        }
+
+        table.table td.team div, #contest-rank-table td.team div, table.table td.team a, #contest-rank-table td.team a { max-width: none !important; white-space: nowrap; overflow: visible; text-align: left !important; }
+        .contestant-avatar { width: 20px !important; height: 20px !important; border-radius: 50% !important; object-fit: cover !important; margin-right: 6px !important; border: 1px solid var(--vjb-card-border) !important; }
+
+        /* 💡 柔和修复“我自己”在排行榜中的高亮，绝对不会太浓！ */
+        tr.myself td, tr.my-team td, #contest-rank-table tr.myself td, #contest-rank-table tr.my-team td {
+            background-color: color-mix(in srgb, var(--vjb-theme) 10%, var(--vjb-cell-bg)) !important;
+            color: var(--vjb-text-main) !important;
+            font-weight: 700 !important;
+        }
+
+        #contest-rank-table td.prob.accepted:not(.fb), #contest-rank-table tr:hover td.prob.accepted:not(.fb) {
+            background-color: color-mix(in srgb, rgba(46, 204, 113, 1) 22%, var(--vjb-cell-bg)) !important;
+            color: rgba(39, 174, 96, 0.95) !important; font-weight: 600 !important;
+        }
+        #contest-rank-table td.prob.accepted.fb, #contest-rank-table tr:hover td.prob.accepted.fb { background-image: linear-gradient(135deg, rgba(39, 174, 96, 0.85), rgba(46, 204, 113, 0.85)) !important; color: #ffffff !important; font-weight: 700 !important; }
+        #contest-rank-table td.prob span, #contest-rank-table td.prob.accepted span { color: #ff6b6b !important; font-weight: 700 !important; }
+        #contest-rank-table td.prob:not(.accepted):has(span), #contest-rank-table tr:hover td.prob:not(.accepted):has(span) { background-color: color-mix(in srgb, #e74c3c 15%, var(--vjb-cell-bg)) !important; }
+
+        /* 💡 联动主题色的 C++ 语言列标签居中修复 */
+        td.language, th.language { text-align: center !important; }
+        #listStatus td.language div, #listStatus td.language span, .view-solution.self {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto !important; /* 核心居中 */
+            width: fit-content !important;
+            padding: 3px 10px !important;
+            border-radius: 4px !important;
+            background-color: color-mix(in srgb, var(--vjb-theme) 10%, transparent) !important;
+            color: var(--vjb-theme) !important;
+            font-weight: 700 !important;
+            border: 1px solid color-mix(in srgb, var(--vjb-theme) 30%, transparent) !important;
+            white-space: nowrap !important;
+        }
+
+        /* ========== 💡 评测结果悬浮块终极完全居中对齐 ========== */
+        td.status, th.status { text-align: center !important; vertical-align: middle !important; }
+
+        .vjb-status-block {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            margin: 0 auto !important; /* 核心居中引力 */
+            width: auto !important;
+            max-width: none !important;
+            padding: 3px 10px !important;
+            border-radius: 4px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.3px !important;
+            white-space: nowrap !important;
+            text-decoration: none !important;
+            line-height: 1.2 !important;
+            border: 1px solid transparent !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+            transition: all 0.2s ease !important;
+        }
+        .vjb-status-block:hover { filter: brightness(1.2) !important; transform: translateY(-0.5px); }
+
+        .vjb-color-green { background-color: rgba(46, 204, 113, 0.12) !important; color: #2ecc71 !important; border-color: rgba(46, 204, 113, 0.35) !important; }
+        .vjb-color-red { background-color: rgba(231, 76, 60, 0.12) !important; color: #ff6b6b !important; border-color: rgba(231, 76, 60, 0.35) !important; }
+        .vjb-color-orange { background-color: rgba(243, 156, 18, 0.12) !important; color: #f39c12 !important; border-color: rgba(243, 156, 18, 0.35) !important; }
+        .vjb-color-purple { background-color: rgba(155, 89, 182, 0.15) !important; color: #be7bee !important; border-color: rgba(155, 89, 182, 0.4) !important; }
+        .vjb-color-bright-yellow { background-color: rgba(241, 196, 15, 0.12) !important; color: #ffd740 !important; border-color: rgba(241, 196, 15, 0.4) !important; }
+        .vjb-color-dark-yellow { background-color: rgba(211, 84, 0, 0.12) !important; color: #e67e22 !important; border-color: rgba(211, 84, 0, 0.35) !important; }
+        .vjb-color-grey { background-color: rgba(149, 165, 166, 0.12) !important; color: #a6b9bb !important; border-color: rgba(149, 165, 166, 0.3) !important; }
+
+        /* ========== 💡 团队与小组页面规范化卡片 ========== */
+        .group-side-panel-column .card, #group-intro-card, #group-featured-articles-card, #group-contests-card, #group-members-card {
+            background-color: var(--vjb-card-bg) !important;
+            backdrop-filter: blur(12px) !important;
+            border: 1px solid var(--vjb-card-border) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04) !important;
+            margin-bottom: 25px !important;
+            color: var(--vjb-text-main) !important;
+            padding: 18px !important;
+        }
+        #group-logo { border-radius: 8px !important; border: 1px solid var(--vjb-card-border) !important; padding: 4px !important; background-color: rgba(255, 255, 255, 0.05) !important; }
+        .list-group-item { background-color: transparent !important; color: var(--vjb-text-main) !important; border-color: var(--vjb-card-border) !important; }
+
+        /* 评论区美化 */
+        .comment-post { background-color: var(--vjb-card-bg) !important; backdrop-filter: blur(12px) !important; border: 1px solid var(--vjb-card-border) !important; border-radius: 14px !important; margin-bottom: 20px !important; padding: 8px 5px !important; box-shadow: 0 6px 20px rgba(0,0,0,0.04) !important; }
+        .comment-post .info { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 12px !important; padding-bottom: 10px !important; margin-bottom: 12px !important; border-bottom: 1px solid var(--vjb-card-border) !important; color: var(--vjb-text-muted) !important; }
+        .comment-post .info > span:not([class]) { display: none !important; }
+        .comment-post .info .author { font-weight: 800 !important; color: var(--vjb-theme, #4a90e2) !important; }
+        .comment-post .info .time { background-color: var(--vjb-btn-sec-bg) !important; padding: 3px 10px !important; border-radius: 10px !important; border: 1px solid var(--vjb-card-border) !important; }
+        .comment-post .info .vote { display: flex !important; gap: 10px !important; background-color: var(--vjb-btn-sec-bg) !important; padding: 4px 12px !important; border-radius: 12px !important; align-items: center !important; border: 1px solid var(--vjb-card-border) !important; }
+        .comment-post .info .operation { margin-left: auto !important; display: flex !important; gap: 8px !important; }
+        .comment-post .info .operation a { background-color: var(--vjb-btn-sec-bg) !important; padding: 4px 14px !important; border-radius: 12px !important; color: var(--vjb-text-main) !important; text-decoration: none !important; font-weight: 500 !important; border: 1px solid var(--vjb-card-border) !important; transition: all 0.2s !important; }
+        .comment-post .info .operation a:hover { background-color: var(--vjb-theme, #4a90e2) !important; color: #ffffff !important; border-color: var(--vjb-theme, #4a90e2) !important; box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important; }
+        .author-avatar img { border-radius: 50% !important; border: 2px solid var(--vjb-card-border) !important; padding: 2px !important; width: 45px !important; height: 45px !important; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important; }
+        .author-avatar img:hover { transform: scale(1.15) rotate(5deg) !important; border-color: var(--vjb-theme, #4a90e2) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; }
+
+        /* 面板按钮与窗口 */
+        #vjb-float-btn { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background-color: rgba(30, 30, 30, 0.8); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 9998; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
+        #vjb-float-btn:hover { transform: scale(1.1) rotate(90deg); background-color: rgba(60, 60, 60, 0.9); }
+        #vjb-float-btn svg { width: 28px; height: 28px; fill: #fff; }
+        #vjb-settings-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); width: 420px; max-height: 85vh; background-color: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); border-radius: 16px; padding: 25px; z-index: 9999; color: #eee; box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; border: 1px solid rgba(255,255,255,0.1); overflow-y: auto; transition: all 0.3s; }
+        #vjb-settings-panel.active { opacity: 1; pointer-events: all; transform: translate(-50%, -50%) scale(1); }
+        .vjb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .vjb-title { font-size: 18px; font-weight: bold; color: #fff; }
+        .vjb-close { cursor: pointer; font-size: 24px; color: #aaa; transition: color 0.2s; }
+        .vjb-close:hover { color: #fff; }
+        .vjb-group { margin-bottom: 20px; }
+        .vjb-label { display: block; margin-bottom: 8px; font-size: 14px; color: #ccc; }
+        .vjb-select, .vjb-input { width: 100%; padding: 8px 12px; background-color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #333; outline: none; box-sizing: border-box; }
+        .vjb-range-wrap { display: flex; align-items: center; gap: 10px; }
+        .vjb-range { flex: 1; accent-color: var(--vjb-theme, #4a90e2); }
+
+        /* 💡 修复：最高优先级的滑动横条，保证绝对在所有层级最顶端，不会消失 */
+        .vjb-nav-slider {
+            position: absolute;
+            height: 3px;
+            background-color: var(--vjb-theme, #4a90e2) !important;
+            border-radius: 3px 3px 0 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1), width 0.45s cubic-bezier(0.22, 1, 0.36, 1), top 0.4s ease, opacity 0.35s ease;
+            box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important;
+            z-index: 2147483647 !important;
+            will-change: left, width;
+            display: block !important;
+        }
+    </style><style id="vjb-global-fonts">
+                body, p, h1, h2, h3, h4, h5, h6, table, td, th, tr, li, ul, ol, dl, dt, dd, blockquote,
+                label, input, select, button, .btn, .markdown-body, .problem-content, .statement {
+                    font-family: "Google Sans", sans-serif !important;
+                }
+                textarea:not(#submit-solution):not([name="source"]) { font-family: "Google Sans", sans-serif !important; }
+            
+                pre, code:not([class*="math"]):not([class*="katex"]):not([class*="MathJax"]),
+                kbd, samp, .ace_editor, .source-code,
+                #submit-solution, textarea[name="source"], .modal-body textarea {
+                    font-family: "JetBrains Mono NL", monospace !important;
+                }
+                pre *, code *, .ace_editor *, .source-code * { font-family: inherit !important; }
+            
+            var:not(:has(.katex)):not(:has([class*="katex"])):not(:has([class*="MathJax"])) {
+                font-family: "Times New Roman", "Cambria", "MathJax_Math", serif !important;
+                font-style: italic !important;
+            }
+        </style></head>
+
+<body><div id="vjb-bg-container" style="display: none;"></div>
 
 
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-374JLX1715"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-374JLX1715', {
-
-            'user_id': 'wyh120715'
-
-        });
-    </script>
-
-
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9098591903020457"
-        crossorigin="anonymous"></script>
-
-
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="keywords" content="Online Judge, vjudge, OJ, Virtual Judge, ICPC, OnlineJudge" />
-    <meta name="robots" content="index, follow" />
-
-    <title>CSP-S复习4_倍增 - Virtual Judge</title>
-
-    <meta property="og:url" content="https://vjudge.net/contest/829768" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="CSP-S复习4_倍增 - Virtual Judge" />
-    <meta property="og:description" content="Contest [CSP-S复习4_倍增] in Virtual Judge" />
-    <script defer src="/static/bundle/ec8ec55297d92d5fe8a0.js"></script>
-    <script defer src="/static/bundle/2ff0cf0eaf1c86e7d07c.js"></script>
-    <script defer src="/static/bundle/609850a616cd1cd1050e.js"></script>
-    <script defer src="/static/bundle/06988c0cb5f325797923.js"></script>
-    <script defer src="/static/bundle/f0ddc3b4b794191bce6d.js"></script>
-    <script defer src="/static/bundle/f8c74aa172b26c07a22b.js"></script>
-    <script defer src="/static/bundle/716f85e13f177dbf5e57.js"></script>
-    <script defer src="/static/bundle/1782ad6754f2ba5b2e05.js"></script>
-    <script defer src="/static/bundle/299406363a67bd8d3660.js"></script>
-    <script defer src="/static/bundle/b7373c012e1684ca87b5.js"></script>
-    <link href="/static/bundle/7dfcff63ee8a84ba4327.css" rel="stylesheet">
-    <link href="/static/bundle/558cf47dd4aa8a2db0b6.css" rel="stylesheet">
-    <link href="/static/bundle/b236573ab843bd819a66.css" rel="stylesheet">
-    <link href="/static/bundle/278c09e66e89cd092b4b.css" rel="stylesheet">
-</head>
-
-<body>
-
-    <head>
-        <script defer src="/static/bundle/31d6cfe0d16ae931b73c.js"></script>
-    </head>
 
 
 
@@ -106,203 +425,159 @@
 
 
 
+<div id="vjb-float-btn"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"></path></svg></div><nav class="navbar navbar-expand-sm navbar-dark bg-dark prod" id="top-nav">
+    <button class="navbar-toggler d-sm-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+        <a class="navbar-brand" href="/">
+            <img src="/static/bundle/11b24ab2156955d8f3fa.ico" height="30">
+            <span data-i18n="top.nav.home">主页</span>
+        </a>
+        <ul class="navbar-nav top-nav-primary">
+            <li class="nav-item" id="nav-problem">
+                <a class="nav-link" href="/problem" data-i18n="top.nav.problem">题目</a>
+            </li>
+            <li class="nav-item" id="nav-status">
+                <a class="nav-link" href="/status" data-i18n="top.nav.status">状态</a>
+            </li>
+            <li class="nav-item active" id="nav-contest">
+                <a class="nav-link" href="/contest" data-i18n="top.nav.contest">比赛</a>
+            </li>
+            <li class="nav-item" id="nav-workbook">
+                <a class="nav-link" href="/workbook" data-i18n="top.nav.workbook">题单</a>
+            </li>
+            <li class="nav-item" id="nav-user">
+                <a class="nav-link" href="/user" data-i18n="top.nav.user">用户</a>
+            </li>
+            <li class="nav-item" id="nav-group">
+                <a class="nav-link" href="/group" data-i18n="top.nav.group">团队</a>
+            </li>
+            <li class="nav-item" id="nav-comment">
+                <a class="nav-link" href="/comment" data-i18n="top.nav.forum">论坛</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="helpDropdown" data-bs-toggle="dropdown" data-i18n="top.nav.help">帮助</a>
+                <div class="dropdown-menu dropdown-menu-start">
+                    <a class="dropdown-item" href="/article/2771">
+                        <i class="fa fa-question-circle-o"></i>
+                        <span data-i18n="top.nav.faq">FAQ</span>
+                    </a>
+                    <a class="dropdown-item" href="/article/97">
+                        <i class="fa fa-bug"></i>
+                        <span data-i18n="top.nav.bf">问题反馈</span>
+                    </a>
+                    <a class="dropdown-item" href="/article/96">
+                        <i class="fa fa-lightbulb-o"></i>
+                        <span data-i18n="top.nav.suggestions">建议</span>
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" id="contact-us">
+                        <i class="fa fa-headphones"></i>
+                        <span data-i18n="top.nav.contact">联系我们</span>
+                    </a>
+                </div>
+            </li>
+            
+        </ul>
+        <ul class="navbar-nav top-nav-secondary ms-sm-auto">
+            <li class="nav-item top-nav-theme-item">
+                <a class="nav-link" href="javascript:void(0)" id="switchTheme" title="Auto Mode" aria-label="Auto Mode"><i class="fa fa-desktop"></i></a>
+            </li>
+            <li class="nav-item dropdown top-nav-locale-item">
+                <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="switchLocale" data-bs-toggle="dropdown" data-i18n="top.nav.locale">语言</a>
+                <div class="dropdown-menu dropdown-menu-end switch-locale-dropdown"><a class="dropdown-item" href="javascript:void(0)" data-locale="en" lang="en">English</a><a class="dropdown-item active" href="javascript:void(0)" data-locale="zh-Hans" lang="zh-Hans" aria-current="true">简体中文</a><a class="dropdown-item" href="javascript:void(0)" data-locale="zh-Hant" lang="zh-Hant">繁體中文</a><a class="dropdown-item" href="javascript:void(0)" data-locale="ja" lang="ja">日本語</a><a class="dropdown-item" href="javascript:void(0)" data-locale="ko" lang="ko">한국어</a><a class="dropdown-item" href="javascript:void(0)" data-locale="ar" lang="ar">اَلْعَرَبِيَّةُ</a><a class="dropdown-item" href="javascript:void(0)" data-locale="bn" lang="bn">বাংলা</a><a class="dropdown-item" href="javascript:void(0)" data-locale="hi" lang="hi">हिन्दी</a><a class="dropdown-item" href="javascript:void(0)" data-locale="vi" lang="vi">Tiếng Việt</a><a class="dropdown-item" href="javascript:void(0)" data-locale="es" lang="es">Español</a><a class="dropdown-item" href="javascript:void(0)" data-locale="pt" lang="pt">português</a><a class="dropdown-item" href="javascript:void(0)" data-locale="ru" lang="ru">русский язык</a><a class="dropdown-item" href="javascript:void(0)" data-locale="kk" lang="kk">Қазақ тілі</a></div>
+            </li>
+            
+                
+                    <li class="nav-item dropdown top-nav-user-item">
+                        <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="userNameDropdown" data-bs-toggle="dropdown">wyh120715</a>
+                        <div class="dropdown-menu dropdown-menu-end user-dropdown">
+                            <a class="dropdown-item" href="/user/wyh120715" data-i18n="top.nav.profile">个人信息</a>
+                            <a class="dropdown-item update-profile" href="javascript:void(0)" data-i18n="top.nav.update">更新资料</a>
+                            <a class="dropdown-item" href="/team/mine" data-i18n="team.mine">我的队伍</a>
+                            <a class="dropdown-item message" href="/message" data-i18n="top.nav.message">私信</a>
+                        </div>
+                    </li>
+                    <li class="nav-item top-nav-logout-item">
+                        <a class="nav-link logout" href="javascript:void(0)" data-i18n="top.nav.logout">登出</a>
+                    </li>
+                
+                
+            
+        </ul>
+    </div>
+</nav>
+<div id="page-panel-toggle-slot"></div>
 
 
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark prod" id="top-nav">
-        <button class="navbar-toggler d-sm-none" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
-            aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <a class="navbar-brand" href="/">
-                <img src="/static/bundle/11b24ab2156955d8f3fa.ico" height="30" />
-                <span data-i18n="top.nav.home"></span>
-            </a>
-            <ul class="navbar-nav top-nav-primary">
-                <li class="nav-item" id="nav-problem">
-                    <a class="nav-link" href="/problem" data-i18n="top.nav.problem"></a>
-                </li>
-                <li class="nav-item" id="nav-status">
-                    <a class="nav-link" href="/status" data-i18n="top.nav.status"></a>
-                </li>
-                <li class="nav-item" id="nav-contest">
-                    <a class="nav-link" href="/contest" data-i18n="top.nav.contest"></a>
-                </li>
-                <li class="nav-item" id="nav-workbook">
-                    <a class="nav-link" href="/workbook" data-i18n="top.nav.workbook"></a>
-                </li>
-                <li class="nav-item" id="nav-user">
-                    <a class="nav-link" href="/user" data-i18n="top.nav.user"></a>
-                </li>
-                <li class="nav-item" id="nav-group">
-                    <a class="nav-link" href="/group" data-i18n="top.nav.group"></a>
-                </li>
-                <li class="nav-item" id="nav-comment">
-                    <a class="nav-link" href="/comment" data-i18n="top.nav.forum"></a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="helpDropdown"
-                        data-bs-toggle="dropdown" data-i18n="top.nav.help"></a>
-                    <div class="dropdown-menu dropdown-menu-start">
-                        <a class="dropdown-item" href="/article/2771">
-                            <i class="fa fa-question-circle-o"></i>
-                            <span data-i18n="top.nav.faq"></span>
-                        </a>
-                        <a class="dropdown-item" href="/article/97">
-                            <i class="fa fa-bug"></i>
-                            <span data-i18n="top.nav.bf"></span>
-                        </a>
-                        <a class="dropdown-item" href="/article/96">
-                            <i class="fa fa-lightbulb-o"></i>
-                            <span data-i18n="top.nav.suggestions"></span>
-                        </a>
-                        <a class="dropdown-item" href="javascript:void(0)" id="contact-us">
-                            <i class="fa fa-headphones"></i>
-                            <span data-i18n="top.nav.contact"></span>
-                        </a>
-                    </div>
-                </li>
-
-            </ul>
-            <ul class="navbar-nav top-nav-secondary ms-sm-auto">
-                <li class="nav-item top-nav-theme-item">
-                    <a class="nav-link" href="javascript:void(0)" id="switchTheme"></a>
-                </li>
-                <li class="nav-item dropdown top-nav-locale-item">
-                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="switchLocale"
-                        data-bs-toggle="dropdown" data-i18n="top.nav.locale"></a>
-                    <div class="dropdown-menu dropdown-menu-end switch-locale-dropdown"></div>
-                </li>
-
-
-                <li class="nav-item dropdown top-nav-user-item">
-                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="userNameDropdown"
-                        data-bs-toggle="dropdown">wyh120715</a>
-                    <div class="dropdown-menu dropdown-menu-end user-dropdown">
-                        <a class="dropdown-item" href="/user/wyh120715" data-i18n="top.nav.profile"></a>
-                        <a class="dropdown-item update-profile" href="javascript:void(0)"
-                            data-i18n="top.nav.update"></a>
-                        <a class="dropdown-item" href="/team/mine" data-i18n="team.mine"></a>
-                        <a class="dropdown-item message" href="/message" data-i18n="top.nav.message"></a>
-                    </div>
-                </li>
-                <li class="nav-item top-nav-logout-item">
-                    <a class="nav-link logout" href="javascript:void(0)" data-i18n="top.nav.logout"></a>
-                </li>
-
-
-
-            </ul>
-        </div>
-    </nav>
-    <div id="page-panel-toggle-slot"></div>
-
-
-    <div class="container-md" style="margin-top: 30px;">
-
+<div class="container-md" style="margin-top: 30px;">
+    
         <div class="row alert alert-info" id="contest-announcement" style="display: none;"></div>
+    
 
-
-        <div class="row card" id="time-info">
-            <div class="row">
-                <div class="col-3 text-start">
-                    <b>
-                        <i18n>contest.view.begin</i18n>
-                        :
-                    </b>
-                    <span class="timestamp">1783671900000</span>
-                </div>
-                <div class="col-6 text-center">
-                    <h3>
-                        <i id="btn-favorite"></i>
-
-                        <img src="/static/bundle/bf2b66129c2d2acc0cc3.png" height="30" />
-
-
-                        CSP-S复习4_倍增
-                    </h3>
-                </div>
-                <div class="col-3 text-end">
-                    <b>
-                        <i18n>contest.view.end</i18n>
-                        :
-                    </b>
-                    <span class="timestamp">1784190300000</span>
-                </div>
+    <div class="row card" id="time-info">
+        <div class="row">
+            <div class="col-3 text-start">
+                <b>
+                    <span>开始时间</span>
+                    :
+                </b>
+                <span class="timestamp">2026-07-17 14:00 CST</span>
             </div>
-            <div class="row" id="contest-time-slider-container">
-                <div id="contest-time"></div>
+            <div class="col-6 text-center">
+                <h3>
+                    <i id="btn-favorite" class="fa fa-star-o"></i>
+                    
+                        <img src="/static/bundle/bf2b66129c2d2acc0cc3.png" height="30">
+                    
+                    
+                    线段树优化建图2
+                </h3>
             </div>
-            <div class="row">
-                <div class="col-3 text-start" id="info-elapsed">
-                    <b>
-                        <i18n>contest.view.elapsed</i18n>
-                        :
-                    </b>
-                    <span class="elapsed" id="span-elapsed"></span>
-                </div>
-                <div class="col-6 text-center">
-                    <span id="info-running"></span>
-                    <span id="info-freeze" style="color: grey">
-                        (<i18n>contest.frozen</i18n>)
-                    </span>
-                </div>
-                <div class="col-3 text-end" id="info-remaining">
-                    <b>
-                        <i18n>contest.view.remaining</i18n>
-                        :
-                    </b>
-                    <span class="remaining" id="span-remaining"></span>
-                </div>
+            <div class="col-3 text-end">
+                <b>
+                    <span>结束时间</span>
+                    :
+                </b>
+                <span class="timestamp">2026-07-28 05:00 CST</span>
             </div>
         </div>
+        <div class="row" id="contest-time-slider-container"></div>
+        <div class="row">
+            <div class="col-3 text-start" id="info-elapsed"></div>
+            <div class="col-6 text-center">
+                <span id="info-running" style="color: var(--color-primary);">开赛倒计时: 21:42:31</span>
+                <span id="info-freeze" style="color: grey; display: none;">
+                    (<span>封榜中</span>)
+                </span>
+            </div>
+            <div class="col-3 text-end" id="info-remaining"></div>
+        </div>
+    </div>
 
-
+    
         <div class="row">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist" id="contest-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="tab" href="#overview" section="overview" role="tab"
-                        data-i18n="contest.view.overview"></a>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#overview" section="overview" role="tab" data-i18n="contest.view.overview" aria-selected="true">概览</a>
                 </li>
 
+                
 
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#problem" section="problem" role="tab"
-                        data-i18n="contest.view.problem"></a>
-                </li>
+                
 
+                
 
-
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#status" section="status" role="tab"
-                        data-i18n="contest.view.status"></a>
-                </li>
-
-
-
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#rank" section="rank" role="tab"
-                        data-i18n="contest.view.rank">
-                        <i class='fa fa-refresh fa-spin'></i>
-                    </a>
-                </li>
-
-
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#discuss" section="discuss" role="tab"
-                        data-i18n="contest.view.discuss" rel="#discuss" data-disqus-identifier="contest/829768"></a>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" data-bs-toggle="tab" href="#discuss" section="discuss" role="tab" data-i18n="contest.view.discuss" rel="#discuss" data-disqus-identifier="contest/831453" aria-selected="false" tabindex="-1">讨论</a>
                 </li>
 
                 <li class="ms-auto text-end">
                     <div class="btn-group" role="group">
-
-                        <button type="button" class="btn btn-secondary" id="btn-preference"
-                            data-i18n="contest.view.preference"></button>
-
-
-
+                        
+                        
+                        
                     </div>
                 </li>
             </ul>
@@ -310,6 +585,7 @@
             <!-- Tab panes -->
             <div class="tab-content">
                 <div class="tab-pane in active" id="overview" role="tabpanel">
+                    
 
 
 
@@ -329,369 +605,127 @@
 
 
 
-
-                    <div id="contest_overview" class="container-fluid px-0">
-                        <div class="row contest-overview-layout">
-                            <aside class="col-lg-4">
-                                <section id="contest-overview-meta-panel" class="contest-overview-panel">
-                                    <h4 data-i18n="contest.view.metadata"></h4>
-                                    <div id="contest-meta"></div>
-                                </section>
-                            </aside>
-                            <main class="col-lg-8">
-                                <section class="contest-overview-panel contest-overview-description-panel">
-                                    <div class="contest-overview-panel-actions">
-                                        <a href="javascript:void(0)" id="contest-overview-text-edit-link"
-                                            class="contest-overview-text-edit-link">
-                                            <i class="fa fa-edit" aria-hidden="true"></i>
-                                            <span data-i18n="contest.view.edit_overview_text"></span>
-                                        </a>
-                                    </div>
-                                    <div id="contest-description" style="display: none"></div>
-                                    <div id="contest-description-ad" class="contest-description-ad"
-                                        style="display: none">
-                                        <ins class="adsbygoogle" style="display:block"
-                                            data-ad-client="ca-pub-9098591903020457" data-ad-slot="1011472145"
-                                            data-ad-format="auto" data-full-width-responsive="true"></ins>
-                                    </div>
-                                </section>
-                            </main>
-                        </div>
-                    </div>
+<div id="contest_overview" class="container-fluid px-0">
+    <div class="row contest-overview-layout">
+        <aside class="col-lg-4">
+            <section id="contest-overview-meta-panel" class="contest-overview-panel">
+                <h4 data-i18n="contest.view.metadata">比赛信息</h4>
+                <div id="contest-meta">
+    <section class="contest-meta-section">
+      <h5 class="contest-meta-section-title" data-i18n="contest.view.meta_section.basic">基础信息</h5>
+      <div class="contest-meta-section-body">
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.view.visibility">可见性</div>
+      <div class="contest-meta-value"><span style="color:var(--color-danger)">私有</span> - 只有团队成员可见可提交</div>
+    </div>
+  
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.view.begin_time">开始时间</div>
+      <div class="contest-meta-value">2026-07-17 14:00:00</div>
+    </div>
+  
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.view.contest_duration">比赛时长</div>
+      <div class="contest-meta-value">10.63 天</div>
+    </div>
+  
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.view.organizer">组织者</div>
+      <div class="contest-meta-value"><a href="/user/wwwqeqeqeqe" target="_blank">wwwqeqeqeqe</a> @ <a href="/group/c2027" target="_blank"><img src="/static/bundle/bf2b66129c2d2acc0cc3.png" height="15">C2027级信息竞赛团队</a></div>
+    </div>
+  
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.view.created_at">创建时间</div>
+      <div class="contest-meta-value">2026-07-16 09:32:54</div>
+    </div>
+  </div>
+    </section>
+  
+    <section class="contest-meta-section">
+      <h5 class="contest-meta-section-title" data-i18n="contest.view.meta_section.rules">规则与评测</h5>
+      <div class="contest-meta-section-body">
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.view.rank_rule_label">排名规则</div>
+      <div class="contest-meta-value">ICPC 规则</div>
+    </div>
+  
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.sum_time.label">总罚时</div>
+      <div class="contest-meta-value">所有时间求和</div>
+    </div>
+  
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.penalty_each">失败罚时(秒/次)</div>
+      <div class="contest-meta-value">1200</div>
+    </div>
+  
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.partial_score.label">部分分</div>
+      <div class="contest-meta-value">禁用</div>
+    </div>
+  
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.evaluation_mode.label">提交与评测方式</div>
+      <div class="contest-meta-value">可多次提交，实时评测，以最优提交计入排名</div>
+    </div>
+  </div>
+    </section>
+  
+    <section class="contest-meta-section">
+      <h5 class="contest-meta-section-title" data-i18n="contest.view.meta_section.visibility">展示与封榜</h5>
+      <div class="contest-meta-section-body">
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.history_rank.label">历史排名</div>
+      <div class="contest-meta-value">始终展示</div>
+    </div>
+  
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.peer_status.label">其他参赛者提交</div>
+      <div class="contest-meta-value">赛后才展示</div>
+    </div>
+  
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.freeze_setting">封榜设置</div>
+      <div class="contest-meta-value">禁用</div>
+    </div>
+  </div>
+    </section>
+  
+    <section class="contest-meta-section">
+      <h5 class="contest-meta-section-title" data-i18n="contest.view.meta_section.participation">参赛信息</h5>
+      <div class="contest-meta-section-body">
+    <div class="contest-meta-item">
+      <div class="contest-meta-label" data-i18n="contest.view.participant_mode">参赛模式</div>
+      <div class="contest-meta-value"><span data-i18n="contest.participant_mode.individual_only">仅个人</span></div>
+    </div>
+  </div>
+    </section>
+  </div>
+            </section>
+        </aside>
+        <main class="col-lg-8">
+            <section class="contest-overview-panel contest-overview-description-panel is-empty-description">
+                <div class="contest-overview-panel-actions">
+                    <a href="javascript:void(0)" id="contest-overview-text-edit-link" class="contest-overview-text-edit-link" style="display: none;">
+                        <i class="fa fa-edit" aria-hidden="true"></i>
+                        <span data-i18n="contest.view.edit_overview_text">编辑简介和公告</span>
+                    </a>
+                </div>
+                <div id="contest-description" style="display: none"></div>
+                <div id="contest-description-ad" class="contest-description-ad" style="">
+                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9098591903020457" data-ad-slot="1011472145" data-ad-format="auto" data-full-width-responsive="true" data-adsense-requested="true"></ins>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
 
                 </div>
-
-                <div class="tab-pane" id="problem" role="tabpanel">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    <div id="contest_problem" class="container-fluid px-0">
-                        <div id="contest-problem-list-view">
-                            <div class="table-responsive px-0">
-                                <table id="contest-problems" class="table table-striped table-bordered" cellspacing="0"
-                                    width="100%">
-                                    <thead></thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div id="contest-problem-detail-view">
-                            <div class="page-panel-toggle-host d-none">
-                                <button type="button"
-                                    class="btn btn-outline-light page-panel-toggle contest-problem-panels-toggle d-none"
-                                    data-bs-toggle="offcanvas" data-bs-target="#prob-left-panel"
-                                    aria-controls="prob-left-panel">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                            <div class="row fixed-left-panel-layout">
-                                <div class="offcanvas-md offcanvas-start problem-side-panel-column fixed-left-panel"
-                                    id="prob-left-panel" tabindex="-1" aria-labelledby="contest-problem-panels-title">
-                                    <div class="offcanvas-header d-md-none">
-                                        <h5 class="offcanvas-title" id="contest-problem-panels-title"
-                                            data-i18n="button.panels"></h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
-                                            data-bs-target="#prob-left-panel" aria-label="Close"></button>
-                                    </div>
-                                    <div class="offcanvas-body problem-side-panel-body">
-                                        <ul class="nav nav-pills problem-side-panel-section" id="problem-nav"></ul>
-
-                                        <div class="alert alert-danger problem-side-panel-alert" role="alert"
-                                            id="prob-alert" style="display: none"></div>
-
-                                        <div id="prob-operation" class="problem-side-panel-section">
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <button type="button" class="btn btn-outline-primary"
-                                                        id="problem-submit"></button>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-6">
-                                                    <a href="#" class="btn btn-secondary" id="btn-contest-status"
-                                                        data-i18n="contest.view.status">Status</a>
-                                                </div>
-                                                <div class="col-6">
-                                                    <a href="#" class="btn btn-secondary" id="btn-contest-my-status"
-                                                        data-i18n="contest.view.my_status">My Status</a>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <a href="#" class="btn btn-secondary" id="btn-contest-problem-pdf"
-                                                        target="_blank">
-                                                        <i class="fa fa-file-pdf-o"></i> PDF
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div id="prob-properties" class="problem-side-panel-section">
-                                            <dl class="card row"></dl>
-                                        </div>
-
-                                        <div id="update-statements-tips"
-                                            class="alert alert-info problem-side-panel-section"
-                                            style="display: none; font-size: 15px; margin-bottom: 0">
-                                            <i18n>contest.view.statement_selection_label</i18n>:
-                                        </div>
-
-                                        <div id="prob-descriptions" class="problem-side-panel-section">
-                                            <div class="list-group" id="prob-descs"></div>
-                                        </div>
-
-                                        <div class="row" style="margin-top: 20px">
-                                            <!-- Contest sidebar -->
-                                            <ins class="adsbygoogle" style="display:block"
-                                                data-ad-client="ca-pub-9098591903020457" data-ad-slot="9577100134"
-                                                data-ad-format="auto" data-full-width-responsive="true"></ins>
-                                            <script>
-                                                var ad_setter = setInterval(function () {
-                                                    if (document.getElementById('contest_problem').offsetParent !== null) {
-                                                        (adsbygoogle = window.adsbygoogle || []).push({});
-                                                        clearInterval(ad_setter);
-                                                    }
-                                                }, 1000);
-                                            </script>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="fixed-main-panel" id="prob-right-panel">
-                                    <div class="row">
-                                        <div id="prob-title-contest">
-                                            <h2 id="problem-title"></h2>
-                                            <span class="origin">
-                                                <a id="problem-origin" href="#" target="_blank"></a>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="row" id="frame-description-container"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="tab-pane" id="status" role="tabpanel">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    <div id="contest_status" class="container-fluid px-0">
-                        <div id="right-panel">
-                            <input type="button" class="btn btn-secondary btn-md" id="refresh-all" value="Refresh"
-                                data-i18n="button.refresh" />
-                            <input type="button" class="btn btn-secondary btn-md" id="reset" data-i18n="button.reset" />
-                            <input type="button" class="btn btn-secondary btn-md" id="filter"
-                                data-i18n="button.filter" />
-                            <div class="table-responsive px-0">
-                                <table id="listStatus" class="table table-striped table-bordered" cellspacing="0"
-                                    width="100%">
-                                    <thead>
-                                        <tr>
-                                            <th class="run-id d-none d-xl-table-cell">ID</th>
-                                            <th class="username">
-                                                <i18n>status.list.username</i18n><br />
-                                                <input type="text" id="un" name="un" class="search_text"
-                                                    style="width:100%" />
-                                            </th>
-                                            <th class="num">
-                                                <i18n>status.list.prob</i18n><br />
-                                                <select id="contest-status-num" name="num" class="form-select">
-                                                    <option value="-" data-i18n="all"></option>
-                                                </select>
-                                            </th>
-                                            <th class="status">
-                                                <i18n>status.list.result</i18n><br />
-                                                <select id="res" name="res" class="form-select">
-                                                    <option value="all" data-i18n="all"></option>
-                                                    <option value="AC" data-i18n="status.result.accepted"></option>
-                                                    <option value="PE" data-i18n="status.result.presentation_error">
-                                                    </option>
-                                                    <option value="WA" data-i18n="status.result.wrong_answer"></option>
-                                                    <option value="TLE" data-i18n="status.result.time_limit_exceeded">
-                                                    </option>
-                                                    <option value="MLE" data-i18n="status.result.memory_limit_exceeded">
-                                                    </option>
-                                                    <option value="OLE" data-i18n="status.result.output_limit_exceeded">
-                                                    </option>
-                                                    <option value="RE" data-i18n="status.result.runtime_error"></option>
-                                                    <option value="CE" data-i18n="status.result.compile_error"></option>
-                                                    <option value="JUDGE_FAILED" data-i18n="status.result.judge_failed">
-                                                    </option>
-                                                    <option value="SUBMIT_FAILED_PERM"
-                                                        data-i18n="status.result.unknown_error"></option>
-                                                    <option value="SUBMIT_FAILED_TEMP"
-                                                        data-i18n="status.result.submit_failed"></option>
-                                                    <option value="PENDING"
-                                                        data-i18n="status.result.queuing_and_judging"></option>
-                                                </select>
-                                            </th>
-                                            <th class="runtime">
-                                                <i18n>status.list.time</i18n><br>(ms)
-                                            </th>
-                                            <th class="memory">
-                                                <i18n>status.list.mem</i18n><br>(MB)
-                                            </th>
-                                            <th class="length d-none d-xl-table-cell">
-                                                <i18n>status.list.length</i18n>
-                                            </th>
-                                            <th class="language">
-                                                <i18n>status.list.lang</i18n><br />
-                                                <select name="language" id="language" class="form-select">
-                                                    <option value="" data-i18n="all"></option>
-
-                                                    <option value="C">C</option>
-
-                                                    <option value="CPP">C++</option>
-
-                                                    <option value="CSHARP">C#</option>
-
-                                                    <option value="D">D</option>
-
-                                                    <option value="GO">Go</option>
-
-                                                    <option value="HASKELL">Haskell</option>
-
-                                                    <option value="JAVA">Java</option>
-
-                                                    <option value="JAVASCRIPT">JavaScript</option>
-
-                                                    <option value="KOTLIN">Kotlin</option>
-
-                                                    <option value="LUA">Lua</option>
-
-                                                    <option value="OBJECTIVE_C">Objective-C</option>
-
-                                                    <option value="PASCAL">Pascal</option>
-
-                                                    <option value="PERL">Perl</option>
-
-                                                    <option value="PHP">PHP</option>
-
-                                                    <option value="PYTHON">Python</option>
-
-                                                    <option value="RUBY">Ruby</option>
-
-                                                    <option value="RUST">Rust</option>
-
-                                                    <option value="SCALA">Scala</option>
-
-                                                    <option value="SWIFT">Swift</option>
-
-                                                    <option value="OTHER">Other</option>
-
-                                                </select>
-                                            </th>
-                                            <th class="date">
-                                                <i18n>status.list.submit_time</i18n>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-
-                <div class="tab-pane" id="rank" role="tabpanel">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    <div id="contest_rank">
-                        <div class="table-responsive contest-rank-table-scroll" id="contest-rank-table-scroll">
-                            <table id="contest-rank-table" cellspacing="1"></table>
-                        </div>
-                        <div class="contest-rank-sticky-head" id="contest-rank-sticky-head"></div>
-                        <table id="contest-rank-table-export"></table>
-
-                        <div class="rank_tool">
-                            <i class="fa fa-line-chart fa-3x" id="img_time_chart" title="Time chart"></i>
-                        </div>
-
-                        <!-- Team info modal -->
-                        <div class="modal fade" id="teamInfoModal" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title"></h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <table class="table table-striped table-bordered contest-info"></table>
-                                        <div class="rank-time-chart-layout">
-                                            <div id="rank-time-chart-tooltip" class="rank-time-chart-tooltip-panel">
-                                            </div>
-                                            <div id="rank-time-chart"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
+                
+                
+                
                 <div class="tab-pane" id="discuss" role="tabpanel">
+                    
 
 
 
@@ -711,92 +745,95 @@
 
 
 
+<div id="contest_discuss"><div class="comment-posts-container"><div class="show-comment-edit" data-i18n="comment.view.leave_a_comment">留个言</div><div class="load-all-replies" style="display: none;">
+        <i class="fa fa-angle-double-down" aria-hidden="true"></i>
+        <span data-i18n="comment.view.load_all_replies">加载全部回复</span>
+    </div><div class="comments-loader" style="display: none;">
+        <i class="fa fa-2x fa-refresh fa-spin"></i> <span data-i18n="comment.view.loading_comments">加载评论中...</span>
+    </div>
 
-                    <div id="contest_discuss"></div>
+    
+    
+    <div class="show-spam" style="display: none;" data-i18n="comment.view.show_spam">显示 Spam</div>
+    
+
+    
+
+</div></div>
 
                 </div>
             </div>
 
         </div>
+    
+
+    
+
+</div>
+
+<textarea style="display: none" name="dataJson">{"id":831453,"title":"线段树优化建图2","type":1,"openness":2,"authStatus":2,"begin":1784268000000,"end":1785186000000,"freezeTime":1785186000000,"unfreezeTime":1785186000000,"enableFreeze":false,"createTime":1784165574000,"version":"5da","started":false,"ended":false,"managerId":88373,"managerName":"wwwqeqeqeqe","groupShortName":"c2027","groupName":"C2027级信息竞赛团队","fav":false,"enableTimeMachine":true,"sumTime":true,"penalty":1200,"partialScore":false,"oneShot":false,"customizedWeight":false,"showPeers":false,"participantMode":0,"excludedFromRank":false,"participation":{"enabled":false,"canChange":false,"options":[{"type":"user","name":"wyh120715"}]},"clonedFromId":0}</textarea>
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="body-footer">
+    <div style="margin-bottom: 8px">
+        <a href="mailto:is.un@qq.com" target="_blank">
+            <img src="/static/bundle/159d24b1b159c99a98e3.svg">
+        </a>
+        <img src="/static/bundle/fdbb90aaddd32a5ab4ad.png" class="qq" data-bs-toggle="popover" data-bs-placement="top">
+        <a href="https://weibo.com/u/5340553087" target="_blank">
+            <img src="/static/bundle/aae271671b3d18e15b40.svg">
+        </a>
+        <a href="https://space.bilibili.com/3056509/lists/3909505" target="_blank">
+            <img src="/static/bundle/ad1d62977bf56d0e0010.png">
+        </a>
+        <a href="https://t.me/joinchat/Erw7nRGwXN3iSCoKguVW3w" target="_blank">
+            <img src="/static/bundle/7182da66feaf3e99632a.svg">
+        </a>
+        <a href="https://www.facebook.com/virtualjudge/" target="_blank">
+            <img src="/static/bundle/c2687d1cf1f3e06984eb.svg">
+        </a>
     </div>
-
-    <textarea style="display: none"
-        name="dataJson">{"id":829768,"title":"CSP-S复习4_倍增","type":1,"openness":2,"authStatus":2,"begin":1783671900000,"end":1784190300000,"freezeTime":1784190300000,"unfreezeTime":1784190300000,"enableFreeze":false,"createTime":1783671770000,"version":"2e2","started":true,"ended":false,"managerId":1249092,"managerName":"yiyeli_hongfan","groupShortName":"c2027","groupName":"C2027级信息竞赛团队","fav":false,"description":{},"problems":[{"pid":4108411,"title":"接竹竿","oj":"洛谷","probNum":"P10264","num":"A","enabledDescKeys":[366430780665698],"descBriefs":[{"key":366430780665698,"updateDate":"2026-07-02","version":1782980214000,"author":"System","authorKey":"main","type":"main","lang":"zh","langDisplay":"中文","official":true,"mainOfficial":true,"publicVisible":true,"remarks":"Initialization."}],"properties":[{"title":"time_limit","content":"1000 ms","spoiler":false},{"title":"mem_limit","content":"524288 kB","spoiler":false}],"weight":1,"submitMethods":[false,true,true]},{"pid":4148346,"title":"树上旅行","oj":"洛谷","probNum":"P13019","num":"B","enabledDescKeys":[406975059910604],"descBriefs":[{"key":406975059910604,"updateDate":"2026-07-10","version":1783673050000,"author":"System","authorKey":"main","type":"main","lang":"zh","langDisplay":"中文","official":true,"mainOfficial":true,"publicVisible":true,"remarks":"Initialization."}],"properties":[{"title":"time_limit","content":"1000 ms","spoiler":false},{"title":"mem_limit","content":"524288 kB","spoiler":false}],"weight":1,"submitMethods":[false,true,true]},{"pid":4054282,"title":"Swapity Swapity Swap S","oj":"洛谷","probNum":"P6148","num":"C","enabledDescKeys":[322304243667563],"descBriefs":[{"key":322304243667563,"updateDate":"2026-07-13","version":1783923492000,"author":"System","authorKey":"main","type":"main","lang":"zh","langDisplay":"中文","official":true,"mainOfficial":true,"publicVisible":true,"remarks":"Initialization."}],"properties":[{"title":"time_limit","content":"2000 ms","spoiler":false},{"title":"mem_limit","content":"256000 kB","spoiler":false}],"weight":1,"submitMethods":[false,true,true]},{"pid":4107174,"title":"Walking in Manhattan G","oj":"洛谷","probNum":"P10137","num":"D","enabledDescKeys":[371674073811583],"descBriefs":[{"key":371674073811583,"updateDate":"2026-07-04","version":1783155582000,"author":"System","authorKey":"main","type":"main","lang":"zh","langDisplay":"中文","official":true,"mainOfficial":true,"publicVisible":true,"remarks":"Initialization."}],"properties":[{"title":"time_limit","content":"2000 ms","spoiler":false},{"title":"mem_limit","content":"262144 kB","spoiler":false}],"weight":1,"submitMethods":[false,true,true]},{"pid":4054990,"title":"Surveillance","oj":"洛谷","probNum":"P6902","num":"E","enabledDescKeys":[403085509343061],"descBriefs":[{"key":403085509343061,"updateDate":"2025-08-11","version":1754915594000,"author":"Gemini","authorKey":"translator:1281310:zh","authorUserId":1281310,"type":"translator","statementKey":"zh","lang":"zh","langDisplay":"中文","official":false,"mainOfficial":false,"publicVisible":true,"avatarUrl":"https://cn.cravatar.com/avatar/868a7aa942cfcbdae9ff8bdd506c6729?d\u003drobohash","remarks":"[简体中文] translation by LLM (gemini-2.5-flash)"}],"properties":[{"title":"time_limit","content":"4000 ms","spoiler":false},{"title":"mem_limit","content":"1048576 kB","spoiler":false}],"weight":1,"submitMethods":[false,true,true]}],"problemsHash":"2e2a345bff40870c8d1430a238151afa","privatePeerContestIds":[],"enableTimeMachine":true,"sumTime":false,"penalty":0,"partialScore":true,"oneShot":false,"customizedWeight":false,"showPeers":false,"participantMode":0,"excludedFromRank":false,"participation":{"enabled":false,"canChange":false,"options":[{"type":"user","name":"wyh120715"}]},"clonedFromId":0}</textarea>
-
-    <head>
-        <script defer src="/static/bundle/31d6cfe0d16ae931b73c.js"></script>
-    </head>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <div class="body-footer">
-        <div style="margin-bottom: 8px">
-            <a href="/cdn-cgi/l/email-protection#fd948ed38893bd8c8cd39e9290" target="_blank">
-                <img src="/static/bundle/159d24b1b159c99a98e3.svg" />
-            </a>
-            <img src="/static/bundle/fdbb90aaddd32a5ab4ad.png" class="qq" data-bs-toggle="popover"
-                data-bs-placement="top" />
-            <a href="https://weibo.com/u/5340553087" target="_blank">
-                <img src="/static/bundle/aae271671b3d18e15b40.svg" />
-            </a>
-            <a href="https://space.bilibili.com/3056509/lists/3909505" target="_blank">
-                <img src="/static/bundle/ad1d62977bf56d0e0010.png" />
-            </a>
-            <a href="https://t.me/joinchat/Erw7nRGwXN3iSCoKguVW3w" target="_blank">
-                <img src="/static/bundle/7182da66feaf3e99632a.svg" />
-            </a>
-            <a href="https://www.facebook.com/virtualjudge/" target="_blank">
-                <img src="/static/bundle/c2687d1cf1f3e06984eb.svg" />
-            </a>
-        </div>
-        <div id="footer-info">
-            All Copyright Reserved © 2010-2026<br />
-            <span data-i18n="bottom.server_time"></span>: <span class="currentTimeTZ"></span>
-        </div>
+    <div id="footer-info">
+        All Copyright Reserved © 2010-2026<br>
+        <span data-i18n="bottom.server_time">服务器时间</span>: <span class="currentTimeTZ">2026-07-16 16:17:28 CST</span>
     </div>
+</div>
 
 
-    <input name="systemVersion" type="hidden" value="1783909655879" />
-    <input name="gaId" type="hidden" value="G-374JLX1715" />
+<input name="systemVersion" type="hidden" value="1784167130323">
+<input name="gaId" type="hidden" value="G-374JLX1715">
 
-    <input id="visitor_username" name="username" type="hidden" value="wyh120715" />
-    <input id="visitor_userId" name="userId" type="hidden" value="1130265" />
-    <input id="visitor_sup" name="sup" type="hidden" value="0" />
-    <input id="newMessage" name="newMessage" type="hidden" value="false" />
-
-
+    <input id="visitor_username" name="username" type="hidden" value="wyh120715">
+    <input id="visitor_userId" name="userId" type="hidden" value="1130265">
+    <input id="visitor_sup" name="sup" type="hidden" value="0">
+    <input id="newMessage" name="newMessage" type="hidden" value="false">
 
 
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-    <script type="text/javascript">basePath = "";</script>
 
 
-    <script defer
-        src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496"
-        integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ=="
-        data-cf-beacon='{"version":"2024.11.0","token":"cbda702c6a634090aafa4717574879a5","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
-        crossorigin="anonymous"></script>
-</body>
+<script type="text/javascript">basePath = "";</script>
 
-</html>
+
+<script defer="" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;cbda702c6a634090aafa4717574879a5&quot;,&quot;r&quot;:1,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
+
+
+<div class="vjb-nav-slider" style="width: 40px; left: 207.922px; top: 45.2969px; opacity: 1;"></div></body></html>
