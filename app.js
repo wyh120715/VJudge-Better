@@ -155,6 +155,46 @@
             --bs-primary: var(--vjb-theme) !important;
         }
 
+        /* ========== 比赛公告与信息卡片等高与美化 ========== */
+        .contest-overview-layout {
+            display: flex !important;
+            flex-wrap: wrap !important;
+        }
+        .contest-overview-layout > aside,
+        .contest-overview-layout > main {
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        .contest-overview-layout .contest-overview-panel {
+            flex: 1 1 auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+        }
+        .contest-overview-description-panel {
+            position: relative !important;
+        }
+        .vjb-contest-overview-title {
+            margin-top: 0 !important;
+            margin-bottom: 20px !important;
+            font-size: 1.5rem !important;
+            font-weight: 500 !important;
+            line-height: 1.2 !important;
+        }
+        .vjb-empty-description-placeholder {
+            display: none;
+        }
+        .is-empty-description .vjb-empty-description-placeholder {
+            display: flex !important;
+            flex: 1 1 auto !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: var(--vjb-text-muted) !important;
+            font-size: 16px !important;
+            min-height: 200px !important;
+            font-weight: 500;
+        }
+
         .navbar-nav .nav-link, .nav-tabs .nav-link, .contest-problem-menu .nav-link, .btn-link { position: relative; overflow: hidden; color: var(--vjb-text-muted) !important; transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important; }
         .navbar-nav .nav-link:hover, .nav-tabs .nav-link:hover, .contest-problem-menu .nav-link:hover { color: var(--vjb-theme, #4a90e2) !important; }
         .navbar-nav .active > .nav-link, .navbar-nav .nav-link.active, .nav-tabs .nav-link.active, .contest-problem-menu .nav-link.active { border-bottom: none !important; background: transparent !important; color: var(--vjb-theme, #4a90e2) !important; font-weight: bold !important; }
@@ -869,6 +909,33 @@
         setTimeout(activeFinder, 300);
     }
 
+    // ================= 比赛概览面板优化 =================
+    function initContestOverview() {
+        const descPanel = document.querySelector('.contest-overview-description-panel');
+        if (!descPanel) return;
+
+        // 1. 添加公告标题
+        if (!descPanel.querySelector('.vjb-contest-overview-title')) {
+            const titleEl = document.createElement('h4');
+            titleEl.className = 'vjb-contest-overview-title';
+            titleEl.textContent = '公告';
+            descPanel.prepend(titleEl);
+        }
+
+        // 2. 添加空白占位符
+        if (!descPanel.querySelector('.vjb-empty-description-placeholder')) {
+            const placeholderEl = document.createElement('div');
+            placeholderEl.className = 'vjb-empty-description-placeholder';
+            placeholderEl.textContent = '这里什么都没有……';
+            const adEl = document.getElementById('contest-description-ad');
+            if (adEl) {
+                descPanel.insertBefore(placeholderEl, adEl);
+            } else {
+                descPanel.appendChild(placeholderEl);
+            }
+        }
+    }
+
     // ================= 初始化入口 =================
     function init() {
         loadSettings();
@@ -877,10 +944,12 @@
             document.addEventListener('DOMContentLoaded', () => {
                 initNavSlider();
                 initIframeObserver();
+                initContestOverview();
             });
         } else {
             initNavSlider();
             initIframeObserver();
+            initContestOverview();
         }
         document.addEventListener('load', (e) => {
             if (e.target && e.target.tagName === 'IFRAME') injectIframeStyles(e.target);
@@ -891,9 +960,11 @@
 
         const statusObserver = new MutationObserver(() => {
             processStatusTextElements();
+            initContestOverview();
         });
         statusObserver.observe(document.body, { childList: true, subtree: true });
         processStatusTextElements();
+        initContestOverview();
     }
 
     init();
