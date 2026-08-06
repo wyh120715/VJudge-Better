@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         VJudgeBetter
 // @namespace    http://tampermonkey.net/
-// @version      1.3-Beta
+// @version      1.3
 // @description  VJudge 增强脚本
 // @author       wyh120715
 // @license      MIT
@@ -62,6 +62,7 @@
     };
 
     const DEFAULT_SETTINGS = {
+        lang: 'auto',
         bgType: 'image',
         opacity: 0.85,
         fontCode: 'JetBrains Mono NL',
@@ -75,6 +76,393 @@
     let currentBgData = null;
     let selectedFileData = null;
     let activeBgObjectURL = '';
+
+    // ================= 多语言 i18n 适配系统 =================
+    const TRANSLATIONS = {
+        'zh-CN': {
+            settingsTitle: "VJudgeBetter 设置",
+            langLabel: "界面语言 (Language)",
+            autoDetect: "跟随系统 / 网站",
+            themeColorLabel: "个性全局主题色 (Theme Color)",
+            resetTheme: "恢复默认蓝",
+            codeFontLabel: "代码字体 (Code Font)",
+            noReplace: "不替换",
+            customCodeFontPlaceholder: "或输入系统自定义代码字体名(有内容时优先)",
+            contentFontLabel: "内容字体 (Content Font)",
+            customContentFontPlaceholder: "或输入系统自定义内容字体名(有内容时优先)",
+            bgOpacityLabel: "背景透明度",
+            uploadBgLabel: "上传背景图片/视频",
+            dropText: "点击或拖拽 (.jpg, .png, .gif, .mp4 最大20MB)",
+            bgTypeImage: "图片/GIF",
+            bgTypeVideo: "视频",
+            clearBg: "清除背景",
+            saveBtn: "保存并应用",
+            exportBtn: "导出配置",
+            importBtn: "导入配置",
+            fileTooLargeAlert: "文件过大！大小不能超过 {maxSize}MB",
+            fileSelectedTemp: "✓ 已临时选中文件：{name}",
+            localBgHosted: "✓ 已托管本地大文件背景",
+            externalBgConnected: "✓ 已连接外部背景",
+            announcementTitle: "公告",
+            emptyDescPlaceholder: "这里什么都没有……"
+        },
+        'zh-TW': {
+            settingsTitle: "VJudgeBetter 設定",
+            langLabel: "介面語言 (Language)",
+            autoDetect: "跟隨系統 / 網站",
+            themeColorLabel: "個性全域主題色 (Theme Color)",
+            resetTheme: "恢復預設藍",
+            codeFontLabel: "程式碼字型 (Code Font)",
+            noReplace: "不替換",
+            customCodeFontPlaceholder: "或輸入系統自訂程式碼字型名(有內容時優先)",
+            contentFontLabel: "內容字型 (Content Font)",
+            customContentFontPlaceholder: "或輸入系統自訂內容字型名(有內容時優先)",
+            bgOpacityLabel: "背景透明度",
+            uploadBgLabel: "上傳背景圖片/影片",
+            dropText: "點擊或拖曳 (.jpg, .png, .gif, .mp4 最大20MB)",
+            bgTypeImage: "圖片/GIF",
+            bgTypeVideo: "影片",
+            clearBg: "清除背景",
+            saveBtn: "儲存並套用",
+            fileTooLargeAlert: "檔案過大！大小不能超過 {maxSize}MB",
+            fileSelectedTemp: "✓ 已臨時選取檔案：{name}",
+            localBgHosted: "✓ 已託管本地大檔案背景",
+            externalBgConnected: "✓ 已連接外部背景",
+            announcementTitle: "公告",
+            emptyDescPlaceholder: "這裡什麼都沒有……"
+        },
+        'en': {
+            settingsTitle: "VJudgeBetter Settings",
+            langLabel: "Language",
+            autoDetect: "Auto (System / Site)",
+            themeColorLabel: "Theme Color",
+            resetTheme: "Reset to Default Blue",
+            codeFontLabel: "Code Font",
+            noReplace: "Do not replace",
+            customCodeFontPlaceholder: "Or enter custom code font name (takes priority)",
+            contentFontLabel: "Content Font",
+            customContentFontPlaceholder: "Or enter custom content font name (takes priority)",
+            bgOpacityLabel: "Background Opacity",
+            uploadBgLabel: "Upload Background Image/Video",
+            dropText: "Click or drop file (.jpg, .png, .gif, .mp4 max 20MB)",
+            bgTypeImage: "Image/GIF",
+            bgTypeVideo: "Video",
+            clearBg: "Clear Background",
+            saveBtn: "Save & Apply",
+            exportBtn: "Export Settings",
+            importBtn: "Import Settings",
+            fileTooLargeAlert: "File too large! Size cannot exceed {maxSize}MB",
+            fileSelectedTemp: "✓ Selected file: {name}",
+            localBgHosted: "✓ Local background loaded",
+            externalBgConnected: "✓ External background connected",
+            announcementTitle: "Announcement",
+            emptyDescPlaceholder: "Nothing here..."
+        },
+        'ja': {
+            settingsTitle: "VJudgeBetter 設定",
+            langLabel: "表示言語 (Language)",
+            autoDetect: "自動 (システム / サイト)",
+            themeColorLabel: "テーマカラー (Theme Color)",
+            resetTheme: "デフォルトブルーに戻す",
+            codeFontLabel: "コードフォント (Code Font)",
+            noReplace: "変更しない",
+            customCodeFontPlaceholder: "またはカスタムコードフォント名を入力 (優先)",
+            contentFontLabel: "コンテンツフォント (Content Font)",
+            customContentFontPlaceholder: "またはカスタムコンテンツフォント名を入力 (優先)",
+            bgOpacityLabel: "背景の不透明度",
+            uploadBgLabel: "背景画像/動画をアップロード",
+            dropText: "クリックまたはドロップ (.jpg, .png, .gif, .mp4 最大20MB)",
+            bgTypeImage: "画像/GIF",
+            bgTypeVideo: "動画",
+            clearBg: "背景をクリア",
+            saveBtn: "保存して適用",
+            fileTooLargeAlert: "ファイルが大きすぎます！ {maxSize}MBを超過できません",
+            fileSelectedTemp: "✓ 選択されたファイル：{name}",
+            localBgHosted: "✓ ローカル背景がロードされました",
+            externalBgConnected: "✓ 外部背景が接続されました",
+            announcementTitle: "お知らせ",
+            emptyDescPlaceholder: "ここには何もありません..."
+        },
+        'ko': {
+            settingsTitle: "VJudgeBetter 설정",
+            langLabel: "언어 (Language)",
+            autoDetect: "자동 (시스템 / 사이트)",
+            themeColorLabel: "테마 색상 (Theme Color)",
+            resetTheme: "기본 파란색으로 복원",
+            codeFontLabel: "코드 폰트 (Code Font)",
+            noReplace: "변경 안 함",
+            customCodeFontPlaceholder: "또는 사용자 지정 코드 폰트명 입력 (우선 적용)",
+            contentFontLabel: "본문 폰트 (Content Font)",
+            customContentFontPlaceholder: "또는 사용자 지정 본문 폰트명 입력 (우선 적용)",
+            bgOpacityLabel: "배경 투명도",
+            uploadBgLabel: "배경 이미지/동영상 업로드",
+            dropText: "클릭 또는 드래그 (.jpg, .png, .gif, .mp4 최대 20MB)",
+            bgTypeImage: "이미지/GIF",
+            bgTypeVideo: "동영상",
+            clearBg: "배경 지우기",
+            saveBtn: "저장 및 적용",
+            fileTooLargeAlert: "파일이 너무 큽니다! {maxSize}MB를 초과할 수 없습니다",
+            fileSelectedTemp: "✓ 선택된 파일: {name}",
+            localBgHosted: "✓ 로컬 배경 로드됨",
+            externalBgConnected: "✓ 외부 배경 연결됨",
+            announcementTitle: "공지사항",
+            emptyDescPlaceholder: "여기에 아무것도 없습니다..."
+        },
+        'ar': {
+            settingsTitle: "إعدادات VJudgeBetter",
+            langLabel: "اللغة (Language)",
+            autoDetect: "تلقائي (النظام / الموقع)",
+            themeColorLabel: "لون المظهر (Theme Color)",
+            resetTheme: "استعادة الأزرق الافتراضي",
+            codeFontLabel: "خط البرمجة (Code Font)",
+            noReplace: "عدم الاستبدال",
+            customCodeFontPlaceholder: "أو أدخل اسم خط البرمجة المخصص (له الأولوية)",
+            contentFontLabel: "خط المحتوى (Content Font)",
+            customContentFontPlaceholder: "أو أدخل اسم خط المحتوى المخصص (له الأولوية)",
+            bgOpacityLabel: "شفافية الخلفية",
+            uploadBgLabel: "تحميل صورة/فيديو الخلفية",
+            dropText: "انقر أو اسحب الملف (.jpg, .png, .gif, .mp4 بحد أقصى 20 ميجابايت)",
+            bgTypeImage: "صورة/GIF",
+            bgTypeVideo: "فيديو",
+            clearBg: "مسح الخلفية",
+            saveBtn: "حفظ وتطبيق",
+            fileTooLargeAlert: "الملف كبير جداً! لا يمكن أن يتجاوز الحجم {maxSize} ميجابايت",
+            fileSelectedTemp: "✓ تم تحديد الملف: {name}",
+            localBgHosted: "✓ تم تحميل الخلفية المحلية",
+            externalBgConnected: "✓ تم توصيل الخلفية الخارجية",
+            announcementTitle: "إعلان",
+            emptyDescPlaceholder: "لا يوجد شيء هنا..."
+        },
+        'bn': {
+            settingsTitle: "VJudgeBetter সেটিংস",
+            langLabel: "ভাষা (Language)",
+            autoDetect: "স্বয়ংক্রিয় (সিস্টেম / সাইট)",
+            themeColorLabel: "থিম কালার (Theme Color)",
+            resetTheme: "ডিফল্ট নীল রঙে ফেরত যান",
+            codeFontLabel: "কোড ফন্ট (Code Font)",
+            noReplace: "পরিবর্তন করবেন না",
+            customCodeFontPlaceholder: "অথবা কাস্টম কোড ফন্ট নাম লিখুন (অগ্রাধিকার পাবে)",
+            contentFontLabel: "কনটেন্ট ফন্ট (Content Font)",
+            customContentFontPlaceholder: "অথবা কাস্টম কনটেন্ট ফন্ট নাম লিখুন (অগ্রাধিকার পাবে)",
+            bgOpacityLabel: "ব্যাকগ্রাউন্ড অস্বচ্ছতা",
+            uploadBgLabel: "ব্যাকগ্রাউন্ড ছবি/ভিডিও আপলোড করুন",
+            dropText: "ক্লিক করুন বা ড্রপ করুন (.jpg, .png, .gif, .mp4 সর্বোচ্চ 20MB)",
+            bgTypeImage: "ছবি/GIF",
+            bgTypeVideo: "ভিডিও",
+            clearBg: "ব্যাকগ্রাউন্ড মুছুন",
+            saveBtn: "সংরক্ষণ করুন এবং প্রয়োগ করুন",
+            fileTooLargeAlert: "ফাইলটি খুব বড়! ফাইলের আকার {maxSize}MB এর বেশি হতে পারবে না",
+            fileSelectedTemp: "✓ নির্বাচিত ফাইল: {name}",
+            localBgHosted: "✓ স্থানীয় ব্যাকগ্রাউন্ড লোড হয়েছে",
+            externalBgConnected: "✓ বাহ্যিক ব্যাকগ্রাউন্ড সংযুক্ত",
+            announcementTitle: "ঘোষণা",
+            emptyDescPlaceholder: "এখানে কিছু নেই..."
+        },
+        'hi': {
+            settingsTitle: "VJudgeBetter सेटिंग्स",
+            langLabel: "भाषा (Language)",
+            autoDetect: "स्वचालित (सिस्टम / साइट)",
+            themeColorLabel: "थीम रंग (Theme Color)",
+            resetTheme: "डिफ़ॉल्ट नीला रीसेट करें",
+            codeFontLabel: "कोड फ़ॉन्ट (Code Font)",
+            noReplace: "बदलें नहीं",
+            customCodeFontPlaceholder: "या कस्टम कोड फ़ॉन्ट नाम दर्ज करें (प्राथमिकता)",
+            contentFontLabel: "सामग्री फ़ॉन्ट (Content Font)",
+            customContentFontPlaceholder: "या कस्टम सामग्री फ़ॉन्ट नाम दर्ज करें (प्राथमिकता)",
+            bgOpacityLabel: "पृष्ठभूमि की अपारदर्शिता",
+            uploadBgLabel: "पृष्ठभूमि छवि/वीडियो अपलोड करें",
+            dropText: "क्लिक करें या खींचें (.jpg, .png, .gif, .mp4 अधिकतम 20MB)",
+            bgTypeImage: "इमेज/GIF",
+            bgTypeVideo: "वीडियो",
+            clearBg: "पृष्ठभूमि हटाएं",
+            saveBtn: "सहेजें और लागू करें",
+            fileTooLargeAlert: "फ़ाइल बहुत बड़ी है! आकार {maxSize}MB से अधिक नहीं हो सकता",
+            fileSelectedTemp: "✓ चयनित फ़ाइल: {name}",
+            localBgHosted: "✓ स्थानीय पृष्ठभूमि लोड की गई",
+            externalBgConnected: "✓ बाहरी पृष्ठभूमि कनेक्ट की गई",
+            announcementTitle: "घोषणा",
+            emptyDescPlaceholder: "यहाँ कुछ नहीं है..."
+        },
+        'vi': {
+            settingsTitle: "Cài đặt VJudgeBetter",
+            langLabel: "Ngôn ngữ (Language)",
+            autoDetect: "Tự động (Hệ thống / Trang web)",
+            themeColorLabel: "Màu giao diện (Theme Color)",
+            resetTheme: "Khôi phục màu xanh mặc định",
+            codeFontLabel: "Phông chữ mã (Code Font)",
+            noReplace: "Không thay thế",
+            customCodeFontPlaceholder: "Hoặc nhập tên phông chữ mã tùy chỉnh (ưu tiên)",
+            contentFontLabel: "Phông chữ nội dung (Content Font)",
+            customContentFontPlaceholder: "Hoặc nhập tên phông chữ nội dung tùy chỉnh (ưu tiên)",
+            bgOpacityLabel: "Độ đục nền",
+            uploadBgLabel: "Tải lên hình ảnh/video nền",
+            dropText: "Nhấp hoặc kéo thả (.jpg, .png, .gif, .mp4 tối đa 20MB)",
+            bgTypeImage: "Hình ảnh/GIF",
+            bgTypeVideo: "Video",
+            clearBg: "Xóa nền",
+            saveBtn: "Lưu & Áp dụng",
+            fileTooLargeAlert: "Tệp quá lớn! Kích thước không thể vượt quá {maxSize}MB",
+            fileSelectedTemp: "✓ Đã chọn tệp: {name}",
+            localBgHosted: "✓ Đã tải nền địa phương",
+            externalBgConnected: "✓ Đã kết nối nền bên ngoài",
+            announcementTitle: "Thông báo",
+            emptyDescPlaceholder: "Không có gì ở đây..."
+        },
+        'es': {
+            settingsTitle: "Configuración de VJudgeBetter",
+            langLabel: "Idioma (Language)",
+            autoDetect: "Automático (Sistema / Sitio)",
+            themeColorLabel: "Color del tema (Theme Color)",
+            resetTheme: "Restablecer a azul predeterminado",
+            codeFontLabel: "Fuente de código (Code Font)",
+            noReplace: "No reemplazar",
+            customCodeFontPlaceholder: "O ingrese nombre de fuente de código personalizada (prioridad)",
+            contentFontLabel: "Fuente de contenido (Content Font)",
+            customContentFontPlaceholder: "O ingrese nombre de fuente de contenido personalizada (prioridad)",
+            bgOpacityLabel: "Opacidad de fondo",
+            uploadBgLabel: "Subir imagen/video de fondo",
+            dropText: "Haga clic o arrastre (.jpg, .png, .gif, .mp4 máx. 20 MB)",
+            bgTypeImage: "Imagen/GIF",
+            bgTypeVideo: "Video",
+            clearBg: "Borrar fondo",
+            saveBtn: "Guardar y aplicar",
+            fileTooLargeAlert: "¡Archivo demasiado grande! El tamaño no puede exceder {maxSize}MB",
+            fileSelectedTemp: "✓ Archivo seleccionado: {name}",
+            localBgHosted: "✓ Fondo local cargado",
+            externalBgConnected: "✓ Fondo externo conectado",
+            announcementTitle: "Anuncio",
+            emptyDescPlaceholder: "No hay nada aquí..."
+        },
+        'pt': {
+            settingsTitle: "Configurações do VJudgeBetter",
+            langLabel: "Idioma (Language)",
+            autoDetect: "Automático (Sistema / Site)",
+            themeColorLabel: "Cor do Tema (Theme Color)",
+            resetTheme: "Restaurar azul padrão",
+            codeFontLabel: "Fonte do Código (Code Font)",
+            noReplace: "Não substituir",
+            customCodeFontPlaceholder: "Ou digite o nome da fonte de código personalizada (prioridade)",
+            contentFontLabel: "Fonte do Conteúdo (Content Font)",
+            customContentFontPlaceholder: "Ou digite o nome da fonte de conteúdo personalizada (prioridade)",
+            bgOpacityLabel: "Opacidade do Fundo",
+            uploadBgLabel: "Enviar Imagem/Vídeo de Fundo",
+            dropText: "Clique ou arraste (.jpg, .png, .gif, .mp4 máx 20MB)",
+            bgTypeImage: "Imagem/GIF",
+            bgTypeVideo: "Vídeo",
+            clearBg: "Limpar Fundo",
+            saveBtn: "Salvar e Aplicar",
+            fileTooLargeAlert: "Arquivo muito grande! O tamanho não pode exceder {maxSize}MB",
+            fileSelectedTemp: "✓ Arquivo selecionado: {name}",
+            localBgHosted: "✓ Fundo local carregado",
+            externalBgConnected: "✓ Fundo externo conectado",
+            announcementTitle: "Anúncio",
+            emptyDescPlaceholder: "Nada aqui..."
+        },
+        'ru': {
+            settingsTitle: "Настройки VJudgeBetter",
+            langLabel: "Язык (Language)",
+            autoDetect: "Авто (Система / Сайт)",
+            themeColorLabel: "Цвет темы (Theme Color)",
+            resetTheme: "Сбросить на синий по умолчанию",
+            codeFontLabel: "Шрифт кода (Code Font)",
+            noReplace: "Не заменять",
+            customCodeFontPlaceholder: "Или введите имя пользовательского шрифта кода (приоритет)",
+            contentFontLabel: "Шрифт контента (Content Font)",
+            customContentFontPlaceholder: "Или введите имя пользовательского шрифта контента (приоритет)",
+            bgOpacityLabel: "Прозрачность фона",
+            uploadBgLabel: "Загрузить фото/видео фона",
+            dropText: "Нажмите или перетащите (.jpg, .png, .gif, .mp4 до 20 МБ)",
+            bgTypeImage: "Изображение/GIF",
+            bgTypeVideo: "Видео",
+            clearBg: "Очистить фон",
+            saveBtn: "Сохранить и применить",
+            fileTooLargeAlert: "Файл слишком большой! Размер не может превышать {maxSize} МБ",
+            fileSelectedTemp: "✓ Выбран файл: {name}",
+            localBgHosted: "✓ Локальный фон загружен",
+            externalBgConnected: "✓ Внешний фон подключен",
+            announcementTitle: "Объявление",
+            emptyDescPlaceholder: "Здесь ничего нет..."
+        },
+        'kk': {
+            settingsTitle: "VJudgeBetter баптаулары",
+            langLabel: "Тіл (Language)",
+            autoDetect: "Авто (Жүйе / Сайт)",
+            themeColorLabel: "Тармақ түсі (Theme Color)",
+            resetTheme: "Әдепкі көк түске қайтару",
+            codeFontLabel: "Код шрифті (Code Font)",
+            noReplace: "Ауыстырмау",
+            customCodeFontPlaceholder: "Немесе арнайы код шрифтінің атын енгізіңіз (басымдық)",
+            contentFontLabel: "Мазмұн шрифті (Content Font)",
+            customContentFontPlaceholder: "Немесе арнайы мазмұн шрифтінің атын енгізіңіз (басымдық)",
+            bgOpacityLabel: "Фон мөлдірлігі",
+            uploadBgLabel: "Фондық сурет/бейнені жүктеу",
+            dropText: "Басыңыз немесе тастаңыз (.jpg, .png, .gif, .mp4 макс 20МБ)",
+            bgTypeImage: "Сурет/GIF",
+            bgTypeVideo: "Бейне",
+            clearBg: "Фонды тазалау",
+            saveBtn: "Сақтау және қолдану",
+            fileTooLargeAlert: "Файл тым үлкен! Өлшемі {maxSize} МБ аспауы керек",
+            fileSelectedTemp: "✓ Тандалған файл: {name}",
+            localBgHosted: "✓ Жергілікті фон жүктелді",
+            externalBgConnected: "✓ Сыртқы фон қосылды",
+            announcementTitle: "Хабарландыру",
+            emptyDescPlaceholder: "Мұнда ештеңе жоқ..."
+        }
+    };
+
+    const LANG_NAMES = {
+        'auto': "Follow System/Site / 跟随系统",
+        'zh-CN': "中文 (简体)",
+        'zh-TW': "繁體中文",
+        'en': "English",
+        'ja': "日本語",
+        'ko': "한국어",
+        'ar': "اَلْعَرَبِيَّةُ",
+        'bn': "বাংলা",
+        'hi': "हिन्दी",
+        'vi': "Tiếng Việt",
+        'es': "Español",
+        'pt': "Português",
+        'ru': "Русский язык",
+        'kk': "Қазақ тілі"
+    };
+
+    function detectLanguage() {
+        const sysLang = (navigator.language || navigator.userLanguage || document.documentElement.lang || 'zh-CN').toLowerCase();
+        if (sysLang.startsWith('zh')) {
+            if (sysLang.includes('tw') || sysLang.includes('hk') || sysLang.includes('hant')) return 'zh-TW';
+            return 'zh-CN';
+        }
+        if (sysLang.startsWith('ja')) return 'ja';
+        if (sysLang.startsWith('ko')) return 'ko';
+        if (sysLang.startsWith('ar')) return 'ar';
+        if (sysLang.startsWith('bn')) return 'bn';
+        if (sysLang.startsWith('hi')) return 'hi';
+        if (sysLang.startsWith('vi')) return 'vi';
+        if (sysLang.startsWith('es')) return 'es';
+        if (sysLang.startsWith('pt')) return 'pt';
+        if (sysLang.startsWith('ru')) return 'ru';
+        if (sysLang.startsWith('kk')) return 'kk';
+        if (sysLang.startsWith('en')) return 'en';
+        return 'zh-CN';
+    }
+
+    function getActiveLang() {
+        if (!settings.lang || settings.lang === 'auto') {
+            return detectLanguage();
+        }
+        return settings.lang;
+    }
+
+    function t(key, params = {}) {
+        const lang = getActiveLang();
+        const langDict = TRANSLATIONS[lang] || TRANSLATIONS['zh-CN'];
+        let str = langDict[key] || TRANSLATIONS['zh-CN'][key] || key;
+        for (const [pKey, pVal] of Object.entries(params)) {
+            str = str.replace(new RegExp(`\\{${pKey}\\}`, 'g'), pVal);
+        }
+        return str;
+    }
 
     // ================= 样式注入 (多维全息重塑系统) =================
     const styles = `
@@ -124,7 +512,7 @@
 
         body { background: transparent !important; }
         body, div, span, a, button, input, li, ul, .nav-slider { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        #vjb-bg-container, #vjb-bg-image, #vjb-bg-video, .vjb-nav-slider, img, svg, i, [class*="icon"], [class*="fa"], [class*="glyphicon"], table, tr, td, th { transition: none !important; }
+        #vjb-bg-container, #vjb-bg-image, #vjb-bg-video, .vjb-nav-slider, img, svg, i, [class*="icon"], [class*="fa"], [class*="glyphicon"], table, tr, td, th, .CodeMirror, .CodeMirror * { transition: none !important; }
         #contest-rank-table *, #listStatus * { transition: none !important; }
 
         #vjb-bg-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -9999; pointer-events: none; overflow: hidden; background: var(--vjb-fallback-bg); }
@@ -134,7 +522,7 @@
         #problem-submit, .btn-primary, .btn-check:checked + .btn, .btn-check:checked + .btn-primary, .btn-check:checked + .btn-outline-primary, .btn-group > .btn.active, .btn-group > .btn:active, .nav-pills .nav-link.active, .nav-pills > li.active > a {
             background-color: var(--vjb-theme, #4a90e2) !important; border-color: var(--vjb-theme, #4a90e2) !important; background-image: none !important; color: #ffffff !important; border-radius: 6px !important;
         }
-        #problem-submit.btn-outline-primary, .btn-outline-primary { color: var(--vjb-theme, #4a90e2) !important; border-color: var(--vjb-theme, #4a90e2) !important; background-color: transparent !important; border-radius: 6px !important; }
+        #problem-submit.btn-outline-primary, .btn-outline-primary { color: var(--vjb-theme-text, var(--vjb-theme, #4a90e2)) !important; border-color: var(--vjb-theme, #4a90e2) !important; background-color: transparent !important; border-radius: 6px !important; }
         #problem-submit.btn-outline-primary:hover, .btn-outline-primary:hover { background-color: var(--vjb-theme, #4a90e2) !important; color: #ffffff !important; }
         .pagination .active .page-link, .pagination .page-item.active .page-link, .page-link.active { background-color: var(--vjb-theme, #4a90e2) !important; border-color: var(--vjb-theme, #4a90e2) !important; color: #ffffff !important; }
         .pagination .page-item .page-link { border-radius: 6px !important; margin: 0 2px; }
@@ -142,10 +530,10 @@
         .badge { border-radius: 4px !important; }
         .form-select, .search_text, input[type="text"] { border-radius: 6px !important; border: 1px solid var(--vjb-card-border) !important; }
         .badge.text-bg-primary, .badge.bg-primary { background-color: var(--vjb-theme, #4a90e2) !important; color: #ffffff !important; border: none !important; }
-        .badge.border-primary, .badge.text-primary, .statement-badge-lang { border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme, #4a90e2) !important; background-color: transparent !important; }
-        .problem-description-item.active .statement-badge { border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme, #4a90e2) !important; }
+        .badge.border-primary, .badge.text-primary, .statement-badge-lang { border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme-text, var(--vjb-theme, #4a90e2)) !important; background-color: transparent !important; }
+        .problem-description-item.active .statement-badge { border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme-text, var(--vjb-theme, #4a90e2)) !important; }
 
-        .text-primary { color: var(--vjb-theme, #4a90e2) !important; }
+        .text-primary { color: var(--vjb-theme-text, var(--vjb-theme, #4a90e2)) !important; }
         .bg-primary { background-color: var(--vjb-theme, #4a90e2) !important; }
         .border-primary { border-color: var(--vjb-theme, #4a90e2) !important; }
 
@@ -196,16 +584,16 @@
         }
 
         .navbar-nav .nav-link, .nav-tabs .nav-link, .contest-problem-menu .nav-link, .btn-link { position: relative; overflow: hidden; color: var(--vjb-text-muted) !important; transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important; }
-        .navbar-nav .nav-link:hover, .nav-tabs .nav-link:hover, .contest-problem-menu .nav-link:hover { color: var(--vjb-theme, #4a90e2) !important; }
-        .navbar-nav .active > .nav-link, .navbar-nav .nav-link.active, .nav-tabs .nav-link.active, .contest-problem-menu .nav-link.active { border-bottom: none !important; background: transparent !important; color: var(--vjb-theme, #4a90e2) !important; font-weight: bold !important; }
+        .navbar-nav .nav-link:hover, .nav-tabs .nav-link:hover, .contest-problem-menu .nav-link:hover { color: var(--vjb-theme-text, var(--vjb-theme, #4a90e2)) !important; }
+        .navbar-nav .active > .nav-link, .navbar-nav .nav-link.active, .nav-tabs .nav-link.active, .contest-problem-menu .nav-link.active { border-bottom: none !important; background: transparent !important; color: var(--vjb-theme-text, var(--vjb-theme, #4a90e2)) !important; font-weight: bold !important; }
 
         .nav-pills .nav-link:not(.active), #problem-nav .nav-link:not(.active) { color: var(--vjb-text-muted) !important; background: transparent !important; font-weight: 500 !important; }
-        .nav-pills .nav-link:not(.active):hover, #problem-nav .nav-link:not(.active):hover { color: var(--vjb-theme, #4a90e2) !important; background-color: var(--vjb-hover-bg) !important; }
+        .nav-pills .nav-link:not(.active):hover, #problem-nav .nav-link:not(.active):hover { color: var(--vjb-theme-text, var(--vjb-theme, #4a90e2)) !important; background-color: var(--vjb-hover-bg) !important; }
 
         #prob-operation .btn-secondary, #buttonContainer .btn-secondary, #right-panel .btn-secondary { background-color: var(--vjb-btn-sec-bg) !important; border: 1px solid var(--vjb-card-border) !important; color: var(--vjb-text-muted) !important; box-shadow: none !important; border-radius: 6px !important; }
-        #prob-operation .btn-secondary:hover, #buttonContainer .btn-secondary:hover, #right-panel .btn-secondary:hover { border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme, #4a90e2) !important; background-color: var(--vjb-hover-bg) !important; box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important; }
+        #prob-operation .btn-secondary:hover, #buttonContainer .btn-secondary:hover, #right-panel .btn-secondary:hover { border-color: var(--vjb-theme, #4a90e2) !important; color: var(--vjb-theme-text, var(--vjb-theme, #4a90e2)) !important; background-color: var(--vjb-hover-bg) !important; box-shadow: 0 0 8px var(--vjb-theme, #4a90e2) !important; }
         .list-group-item.active { background-color: var(--vjb-hover-bg) !important; border: 1px solid var(--vjb-card-border) !important; border-left: 4px solid var(--vjb-theme, #4a90e2) !important; color: var(--vjb-text-main) !important; box-shadow: none !important; }
-        .list-group-item.active .statement-author-row a, .list-group-item.active .statement-author-row span { color: var(--vjb-theme, #4a90e2) !important; font-weight: bold !important; }
+        .list-group-item.active .statement-author-row a, .list-group-item.active .statement-author-row span { color: var(--vjb-theme-text, var(--vjb-theme, #4a90e2)) !important; font-weight: bold !important; }
 
         #time-info { background: var(--vjb-card-bg) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important; border: 1px solid var(--vjb-card-border) !important; border-radius: 14px !important; padding: 15px 20px !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important; margin-bottom: 20px !important; color: var(--vjb-text-main) !important; }
         #time-info h3 { color: var(--vjb-text-main) !important; }
@@ -332,7 +720,7 @@
         }
         #contest-rank-table td.prob.accepted.fb, #contest-rank-table tr:hover td.prob.accepted.fb { background-image: linear-gradient(135deg, rgba(39, 174, 96, 0.85), rgba(46, 204, 113, 0.85)) !important; color: #ffffff !important; font-weight: 700 !important; }
         #contest-rank-table td.prob span, #contest-rank-table td.prob.accepted span { color: #ff6b6b !important; font-weight: 700 !important; }
-        #contest-rank-table td.prob:not(.accepted):has(span), #contest-rank-table tr:hover td.prob:not(.accepted):has(span) { background-color: color-mix(in srgb, #e74c3c 15%, var(--vjb-cell-bg)) !important; }
+        #contest-rank-table td.prob.failed, #contest-rank-table tr:hover td.prob.failed { background-color: color-mix(in srgb, #e74c3c 15%, var(--vjb-cell-bg)) !important; }
 
         /* 💡 联动主题色的 C++ 语言列标签居中修复 */
         td.language, th.language { text-align: center !important; }
@@ -345,7 +733,7 @@
             padding: 3px 10px !important;
             border-radius: 4px !important;
             background-color: color-mix(in srgb, var(--vjb-theme) 10%, transparent) !important;
-            color: var(--vjb-theme) !important;
+            color: var(--vjb-theme-text, var(--vjb-theme)) !important;
             font-weight: 700 !important;
             border: 1px solid color-mix(in srgb, var(--vjb-theme) 30%, transparent) !important;
             white-space: nowrap !important;
@@ -402,7 +790,7 @@
         .comment-post { background-color: var(--vjb-card-bg) !important; backdrop-filter: blur(12px) !important; border: 1px solid var(--vjb-card-border) !important; border-radius: 14px !important; margin-bottom: 20px !important; padding: 8px 5px !important; box-shadow: 0 6px 20px rgba(0,0,0,0.04) !important; }
         .comment-post .info { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 12px !important; padding-bottom: 10px !important; margin-bottom: 12px !important; border-bottom: 1px solid var(--vjb-card-border) !important; color: var(--vjb-text-muted) !important; }
         .comment-post .info > span:not([class]) { display: none !important; }
-        .comment-post .info .author { font-weight: 800 !important; color: var(--vjb-theme, #4a90e2) !important; }
+        .comment-post .info .author { font-weight: 800 !important; color: var(--vjb-theme-text, var(--vjb-theme, #4a90e2)) !important; }
         .comment-post .info .time { background-color: var(--vjb-btn-sec-bg) !important; padding: 3px 10px !important; border-radius: 10px !important; border: 1px solid var(--vjb-card-border) !important; }
         .comment-post .info .vote { display: flex !important; gap: 10px !important; background-color: var(--vjb-btn-sec-bg) !important; padding: 4px 12px !important; border-radius: 12px !important; align-items: center !important; border: 1px solid var(--vjb-card-border) !important; }
         .comment-post .info .operation { margin-left: auto !important; display: flex !important; gap: 8px !important; }
@@ -441,96 +829,80 @@
             will-change: left, width;
             display: block !important;
         }
+
+        /* Fix CodeMirror line number / text alignment */
+        .CodeMirror,
+        .CodeMirror-gutters,
+        .CodeMirror-gutter-wrapper,
+        .CodeMirror-linenumber,
+        .CodeMirror-line,
+        .CodeMirror pre,
+        .CodeMirror-code,
+        .CodeMirror-sizer {
+            line-height: 1.5 !important;
+        }
     `;
     GM_addStyle(styles);
 
     // ================= 💡 全息状态流自适应多维分色计算引擎 =================
+    let isProcessingStatus = false;
     function processStatusTextElements() {
-        const selectors = '#listStatus tbody td.status .view-solution, #listStatus tbody td.status > span, #listStatus tbody td.status > a, .status .view-solution, .status > span, table tbody td';
-        const elements = document.querySelectorAll(selectors);
+        if (isProcessingStatus) return;
+        isProcessingStatus = true;
 
-        elements.forEach(el => {
-            if (el.closest('thead') || el.closest('th')) return;
-            if (el.closest('.language') || el.classList.contains('language')) return;
-            if (el.closest('.runtime') || el.closest('.memory') || el.closest('.length')) return;
+        try {
+            const selectors = '#listStatus tbody td.status .view-solution, #listStatus tbody td.status > span, #listStatus tbody td.status > a, td.status .view-solution, td.status > span';
+            const elements = document.querySelectorAll(selectors);
 
-            // 跳过 td 元素本身 —— 直接对 td 应用 flex 会破坏表格列对齐
-            // badge 样式只应用在 td 内部的子元素上
-            if (el.tagName === 'TD') {
-                const table = el.closest('table');
-                if (!table) return;
-                const ths = Array.from(table.querySelectorAll('th'));
-                const resIndex = ths.findIndex(th => th.textContent.includes('评测结果') || th.getAttribute('data-i18n') === 'status.list.result');
-                if (resIndex === -1) return;
-                const tr = el.closest('tr');
-                if (!tr || tr.children[resIndex] !== el) return;
+            elements.forEach(el => {
+                if (el.dataset.vjbStatusDone) return;
+                if (el.closest('thead') || el.closest('th')) return;
+                if (el.closest('.language') || el.classList.contains('language')) return;
+                if (el.closest('.runtime') || el.closest('.memory') || el.closest('.length')) return;
 
-                // 若 td 内已有 .view-solution，交由该元素自身的选择器分支处理，避免双重嵌套
-                if (el.querySelector('.view-solution')) return;
+                let txt = el.textContent ? el.textContent.trim() : "";
+                if (!txt) return;
+                let lowerTxt = txt.toLowerCase();
 
-                // 找到或创建内部包装 span 用于挂 badge（仅针对纯文本内容的 td）
-                let inner = el.querySelector('.vjb-status-inner');
-                if (!inner) {
-                    inner = document.createElement('span');
-                    inner.className = 'vjb-status-inner';
-                    while (el.firstChild) {
-                        inner.appendChild(el.firstChild);
-                    }
-                    el.appendChild(inner);
+                const isGreen = lowerTxt.includes("accepted");
+                const isRed = lowerTxt.includes("wrong answer") || lowerTxt.includes("hacked");
+                const isOrange = lowerTxt.includes("presentation error");
+                const isPurple = lowerTxt.includes("runtime error");
+                const isBrightYellow = lowerTxt.includes("compilation error") || lowerTxt.includes("compile error") || lowerTxt.includes("compilations error");
+                const isDarkYellow = lowerTxt.includes("time limit exceeded") || lowerTxt.includes("memory limit exceeded") || lowerTxt.includes("output limit exceeded") || lowerTxt.includes("idleness limit exceeded");
+
+                const isGrey = lowerTxt.includes("system error") || lowerTxt.includes("internal error") ||
+                    lowerTxt.includes("rejected") || lowerTxt.includes("judgement failed") ||
+                    lowerTxt.includes("security violated") || lowerTxt.includes("denial of judgement") ||
+                    lowerTxt.includes("input preparation failed") || lowerTxt.includes("running") ||
+                    lowerTxt.includes("skipped") || lowerTxt.includes("pending") ||
+                    lowerTxt.includes("in queue") || lowerTxt.includes("waiting") ||
+                    lowerTxt.includes("judging") || lowerTxt.includes("network failed") ||
+                    lowerTxt.includes("login failed") || lowerTxt.includes("submitted") ||
+                    lowerTxt.includes("busy") || lowerTxt.includes("duplicate code") ||
+                    lowerTxt.includes("dumplicate code") || lowerTxt.includes("source code error") ||
+                    lowerTxt.includes("submit error") || lowerTxt.includes("problem unavailable");
+
+                if (isGreen || isRed || isOrange || isPurple || isBrightYellow || isDarkYellow || isGrey) {
+                    let colorClass = "vjb-color-red";
+
+                    if (isGreen) colorClass = "vjb-color-green";
+                    else if (isRed) colorClass = "vjb-color-red";
+                    else if (isOrange) colorClass = "vjb-color-orange";
+                    else if (isPurple) colorClass = "vjb-color-purple";
+                    else if (isBrightYellow) colorClass = "vjb-color-bright-yellow";
+                    else if (isDarkYellow) colorClass = "vjb-color-dark-yellow";
+                    else if (isGrey) colorClass = "vjb-color-grey";
+
+                    el.classList.add('vjb-status-block');
+                    el.classList.remove('vjb-color-green', 'vjb-color-red', 'vjb-color-orange', 'vjb-color-purple', 'vjb-color-bright-yellow', 'vjb-color-dark-yellow', 'vjb-color-grey');
+                    el.classList.add(colorClass);
+                    el.dataset.vjbStatusDone = 'true';
                 }
-                el = inner;
-            }
-
-            let isConfirmedStatusContainer = false;
-
-            if (el.closest('#listStatus tbody td.status')) {
-                isConfirmedStatusContainer = true;
-            } else if (el.classList.contains('view-solution') && !el.closest('.language')) {
-                isConfirmedStatusContainer = true;
-            } else if (el.classList.contains('vjb-status-inner')) {
-                isConfirmedStatusContainer = true;
-            }
-
-            let txt = el.textContent ? el.textContent.trim() : "";
-            if (!txt) return;
-            let lowerTxt = txt.toLowerCase();
-
-            const isGreen = lowerTxt.includes("accepted");
-            const isRed = lowerTxt.includes("wrong answer") || lowerTxt.includes("hacked");
-            const isOrange = lowerTxt.includes("presentation error");
-            const isPurple = lowerTxt.includes("runtime error");
-            const isBrightYellow = lowerTxt.includes("compilation error") || lowerTxt.includes("compile error") || lowerTxt.includes("compilations error");
-            const isDarkYellow = lowerTxt.includes("time limit exceeded") || lowerTxt.includes("memory limit exceeded") || lowerTxt.includes("output limit exceeded") || lowerTxt.includes("idleness limit exceeded");
-
-            // 严密的灰色状态拦截器字典
-            const isGrey = lowerTxt.includes("system error") || lowerTxt.includes("internal error") ||
-                lowerTxt.includes("rejected") || lowerTxt.includes("judgement failed") ||
-                lowerTxt.includes("security violated") || lowerTxt.includes("denial of judgement") ||
-                lowerTxt.includes("input preparation failed") || lowerTxt.includes("running") ||
-                lowerTxt.includes("skipped") || lowerTxt.includes("pending") ||
-                lowerTxt.includes("in queue") || lowerTxt.includes("waiting") ||
-                lowerTxt.includes("judging") || lowerTxt.includes("network failed") ||
-                lowerTxt.includes("login failed") || lowerTxt.includes("submitted") ||
-                lowerTxt.includes("busy") || lowerTxt.includes("duplicate code") ||
-                lowerTxt.includes("dumplicate code") || lowerTxt.includes("source code error") ||
-                lowerTxt.includes("submit error") || lowerTxt.includes("problem unavailable");
-
-            if (isConfirmedStatusContainer || isGreen || isRed || isOrange || isPurple || isBrightYellow || isDarkYellow || isGrey) {
-                let colorClass = "vjb-color-red";
-
-                if (isGreen) colorClass = "vjb-color-green";
-                else if (isRed) colorClass = "vjb-color-red";
-                else if (isOrange) colorClass = "vjb-color-orange";
-                else if (isPurple) colorClass = "vjb-color-purple";
-                else if (isBrightYellow) colorClass = "vjb-color-bright-yellow";
-                else if (isDarkYellow) colorClass = "vjb-color-dark-yellow";
-                else if (isGrey) colorClass = "vjb-color-grey";
-
-                el.classList.add('vjb-status-block');
-                el.classList.remove('vjb-color-green', 'vjb-color-red', 'vjb-color-orange', 'vjb-color-purple', 'vjb-color-bright-yellow', 'vjb-color-dark-yellow', 'vjb-color-grey');
-                el.classList.add(colorClass);
-            }
-        });
+            });
+        } finally {
+            isProcessingStatus = false;
+        }
     }
 
     // ================= 同源穿透向题面 iframe 灌入非干涉继承性字体样式 =================
@@ -580,20 +952,23 @@
     }
 
     function initIframeObserver() {
-        const container = document.getElementById('frame-description-container');
-        if (!container) return;
+        const checkAndInject = () => {
+            const iframes = document.querySelectorAll('#frame-description-container iframe, iframe');
+            iframes.forEach(iframe => {
+                try {
+                    injectIframeStyles(iframe);
+                    if (!iframe.dataset.vjbLoaded) {
+                        iframe.dataset.vjbLoaded = 'true';
+                        iframe.addEventListener('load', () => injectIframeStyles(iframe), { once: true });
+                    }
+                } catch (e) { }
+            });
+        };
 
-        const observer = new MutationObserver(() => {
-            const iframe = container.querySelector('iframe');
-            if (iframe) {
-                injectIframeStyles(iframe);
-                iframe.addEventListener('load', () => injectIframeStyles(iframe), { once: true });
-            }
-        });
-        observer.observe(container, { childList: true, subtree: true });
+        checkAndInject();
 
-        const iframe = container.querySelector('iframe');
-        if (iframe) injectIframeStyles(iframe);
+        const observer = new MutationObserver(() => checkAndInject());
+        observer.observe(document.body, { childList: true, subtree: true });
     }
 
     // ================= 业务控制 =================
@@ -615,11 +990,45 @@
         applySettings();
     }
 
+    /* 计算相对亮度，用于判断主题色是否太亮 */
+    function hexToRgb(hex) {
+        hex = hex.replace(/^#/, '');
+        if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+        const n = parseInt(hex, 16);
+        return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    }
+    function relativeLuminance([r, g, b]) {
+        const [rs, gs, bs] = [r, g, b].map(c => {
+            c /= 255;
+            return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    }
+    function darkenHex(hex, factor) {
+        const [r, g, b] = hexToRgb(hex);
+        const clamp = v => Math.max(0, Math.min(255, Math.round(v * factor)));
+        return `#${[clamp(r), clamp(g), clamp(b)].map(v => v.toString(16).padStart(2, '0')).join('')}`;
+    }
+    function getThemeTextColor(hex) {
+        const rgb = hexToRgb(hex);
+        const lum = relativeLuminance(rgb);
+        /* 亮度阈值 0.4：高于此值的颜色在浅色背景上对比度不足 */
+        if (lum > 0.4) {
+            /* 根据亮度程度逐步加深，最多压暗到 35% */
+            const factor = Math.max(0.35, 1 - (lum - 0.4) * 1.2);
+            return darkenHex(hex, factor);
+        }
+        return hex;
+    }
+
     function applySettings() {
         const root = document.documentElement;
         root.style.setProperty('--vjb-opacity', settings.opacity);
         const themeColor = settings.themeColor || '#4a90e2';
         root.style.setProperty('--vjb-theme', themeColor);
+        /* 为文字场景生成对比度安全的主题色 */
+        const themeTextColor = getThemeTextColor(themeColor);
+        root.style.setProperty('--vjb-theme-text', themeTextColor);
 
         let fontStyleEl = document.getElementById('vjb-global-fonts');
         if (!fontStyleEl) {
@@ -648,16 +1057,23 @@
             fontCss += `
                 pre, code:not([class*="math"]):not([class*="katex"]):not([class*="MathJax"]),
                 kbd, samp, .ace_editor, .source-code,
-                #submit-solution, textarea[name="source"], .modal-body textarea {
+                #submit-solution, textarea[name="source"], .modal-body textarea,
+                .CodeMirror, .CodeMirror-linenumber, .CodeMirror-gutters,
+                .CodeMirror-gutter-wrapper, .CodeMirror-gutter-elt,
+                .CodeMirror-line, .CodeMirror-code, .CodeMirror pre {
                     font-family: ${useCode}, monospace !important;
                 }
                 pre *, code *, .ace_editor *, .source-code * { font-family: inherit !important; }
             `;
         }
         fontCss += `
-            var:not(:has(.katex)):not(:has([class*="katex"])):not(:has([class*="MathJax"])) {
+            var {
                 font-family: "Times New Roman", "Cambria", "MathJax_Math", serif !important;
                 font-style: italic !important;
+            }
+            .katex var, [class*="katex"] var, [class*="MathJax"] var {
+                font-family: inherit !important;
+                font-style: inherit !important;
             }
         `;
         fontStyleEl.innerHTML = fontCss;
@@ -730,52 +1146,71 @@
         const makeOption = (list, selected) => list.map(f => `<option value="${f}" style="font-family: '${f}' !important;" ${f === selected ? 'selected' : ''}>${f}</option>`).join('');
 
         panel.innerHTML = `
-            <div class="vjb-header"><span class="vjb-title">VJudgeBetter 设置</span><span class="vjb-close">&times;</span></div>
+            <div class="vjb-header"><span class="vjb-title">${t('settingsTitle')}</span><span class="vjb-close">&times;</span></div>
 
             <div class="vjb-group">
-                <label class="vjb-label">个性全局主题色 (Theme Color)</label>
+                <label class="vjb-label">${t('langLabel')}</label>
+                <select id="vjb-set-lang" class="vjb-select">
+                    ${Object.entries(LANG_NAMES).map(([code, name]) => `<option value="${code}" ${settings.lang === code ? 'selected' : ''}>${name}</option>`).join('')}
+                </select>
+            </div>
+
+            <div class="vjb-group">
+                <label class="vjb-label">${t('themeColorLabel')}</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <input type="color" id="vjb-set-theme" value="${settings.themeColor}" style="width: 50px; height: 35px; padding: 0; border: none; background: transparent; cursor: pointer;">
-                    <button id="vjb-reset-theme" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #ccc; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 13px; transition: all 0.2s;">恢复默认蓝</button>
+                    <button id="vjb-reset-theme" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #ccc; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 13px; transition: all 0.2s;">${t('resetTheme')}</button>
                 </div>
             </div>
 
             <div class="vjb-group">
-                <label class="vjb-label">代码字体 (Code Font)</label>
+                <label class="vjb-label">${t('codeFontLabel')}</label>
                 <select id="vjb-set-font-code" class="vjb-select" style="font-family: inherit;">
-                    <option value="none" style="font-family: inherit;" ${settings.fontCode === 'none' ? 'selected' : ''}>不替换</option>
+                    <option value="none" style="font-family: inherit;" ${settings.fontCode === 'none' ? 'selected' : ''}>${t('noReplace')}</option>
                     ${makeOption(FONTS.code, settings.fontCode)}
                 </select>
-                <input type="text" id="vjb-set-custom-code" class="vjb-input" style="margin-top:6px;" placeholder="或输入系统自定义代码字体名(有内容时优先)" value="${settings.customFontCode || ''}">
+                <input type="text" id="vjb-set-custom-code" class="vjb-input" style="margin-top:6px;" placeholder="${t('customCodeFontPlaceholder')}" value="${settings.customFontCode || ''}">
             </div>
 
             <div class="vjb-group">
-                <label class="vjb-label">内容字体 (Content Font)</label>
+                <label class="vjb-label">${t('contentFontLabel')}</label>
                 <select id="vjb-set-font-content" class="vjb-select" style="font-family: inherit;">
-                    <option value="none" style="font-family: inherit;" ${settings.fontContent === 'none' ? 'selected' : ''}>不替换</option>
+                    <option value="none" style="font-family: inherit;" ${settings.fontContent === 'none' ? 'selected' : ''}>${t('noReplace')}</option>
                     ${makeOption(FONTS.content, settings.fontContent)}
                 </select>
-                <input type="text" id="vjb-set-custom-content" class="vjb-input" style="margin-top:6px;" placeholder="或输入系统自定义内容字体名(有内容时优先)" value="${settings.customFontContent || ''}">
+                <input type="text" id="vjb-set-custom-content" class="vjb-input" style="margin-top:6px;" placeholder="${t('customContentFontPlaceholder')}" value="${settings.customFontContent || ''}">
             </div>
 
-            <div class="vjb-group"><label class="vjb-label">背景透明度</label><div class="vjb-range-wrap"><input type="range" id="vjb-set-opacity" class="vjb-range" min="0" max="1" step="0.05" value="${settings.opacity}"><span id="vjb-op-val">${Math.round(settings.opacity * 100)}%</span></div></div>
-            <div class="vjb-group"><label class="vjb-label">上传背景图片/视频</label>
+            <div class="vjb-group"><label class="vjb-label">${t('bgOpacityLabel')}</label><div class="vjb-range-wrap"><input type="range" id="vjb-set-opacity" class="vjb-range" min="0" max="1" step="0.05" value="${settings.opacity}"><span id="vjb-op-val">${Math.round(settings.opacity * 100)}%</span></div></div>
+            <div class="vjb-group"><label class="vjb-label">${t('uploadBgLabel')}</label>
                 <div id="vjb-drop-zone" style="border: 2px dashed rgba(255,255,255,0.3); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease;">
-                    <div id="vjb-drop-text">点击或拖拽 (.jpg, .png, .gif, .mp4 最大20MB)</div>
+                    <div id="vjb-drop-text">${t('dropText')}</div>
                     <input type="file" id="vjb-file-input" accept="image/*,video/mp4" style="display: none;">
                     <div id="vjb-file-info" style="color: var(--vjb-theme, #4a90e2); display: none; font-weight: bold;"></div>
                 </div>
                 <div style="margin-top:10px; display:flex; gap:10px;">
-                    <label><input type="radio" name="bgType" value="image" ${settings.bgType === 'image' ? 'checked' : ''}> 图片/GIF</label>
-                    <label><input type="radio" name="bgType" value="video" ${settings.bgType === 'video' ? 'checked' : ''}> 视频</label>
-                    <button id="vjb-clear-bg" style="background:none; border:1px solid #666; color:#aaa; padding:2px 8px; border-radius:4px; cursor:pointer;">清除背景</button>
+                    <label><input type="radio" name="bgType" value="image" ${settings.bgType === 'image' ? 'checked' : ''}> ${t('bgTypeImage')}</label>
+                    <label><input type="radio" name="bgType" value="video" ${settings.bgType === 'video' ? 'checked' : ''}> ${t('bgTypeVideo')}</label>
+                    <button id="vjb-clear-bg" style="background:none; border:1px solid #666; color:#aaa; padding:2px 8px; border-radius:4px; cursor:pointer;">${t('clearBg')}</button>
                 </div>
             </div>
-            <div style="text-align:right; margin-top:20px;"><button id="vjb-save-btn" style="background:var(--vjb-theme, #4a90e2); color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer; font-weight:bold;">保存并应用</button></div>
+            <div style="text-align:right; margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
+                <button id="vjb-export-btn" style="background:none; border:1px solid var(--vjb-theme, #4a90e2); color:var(--vjb-theme-text, var(--vjb-theme, #4a90e2)); padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">${t('exportBtn')}</button>
+                <button id="vjb-import-btn" style="background:none; border:1px solid var(--vjb-theme, #4a90e2); color:var(--vjb-theme-text, var(--vjb-theme, #4a90e2)); padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">${t('importBtn')}</button>
+                <input type="file" id="vjb-import-input" accept=".json" style="display:none;">
+                <button id="vjb-save-btn" style="background:var(--vjb-theme, #4a90e2); color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer; font-weight:bold;">${t('saveBtn')}</button>
+            </div>
         `;
         document.body.appendChild(panel);
 
         panel.querySelector('.vjb-close').onclick = toggleSettingsPanel;
+
+        document.getElementById('vjb-set-lang').onchange = (e) => {
+            settings.lang = e.target.value;
+            panel.remove();
+            createSettingsPanel();
+            toggleSettingsPanel();
+        };
 
         document.getElementById('vjb-reset-theme').onclick = () => {
             document.getElementById('vjb-set-theme').value = '#4a90e2';
@@ -786,13 +1221,13 @@
 
         function handleFileSelect(file) {
             if (!file) return;
-            const maxSize = file.type.startsWith('video/') ? 20 * 1024 * 1024 : 5 * 1024 * 1024;
-            if (file.size > maxSize) return alert(`文件过大！大小不能超过 ${maxSize / 1024 / 1024}MB`);
+            const maxSize = file.type.startsWith('video/') ? 20 : 5;
+            if (file.size > maxSize * 1024 * 1024) return alert(t('fileTooLargeAlert', { maxSize }));
 
             selectedFileData = file;
             document.getElementById('vjb-drop-text').style.display = 'none';
             const fi = document.getElementById('vjb-file-info');
-            fi.style.display = 'block'; fi.innerHTML = `✓ 已临时选中文件：${file.name}`;
+            fi.style.display = 'block'; fi.innerHTML = t('fileSelectedTemp', { name: file.name });
         }
 
         dropZone.onclick = () => fileInput.click();
@@ -825,6 +1260,7 @@
         };
 
         document.getElementById('vjb-save-btn').onclick = () => {
+            settings.lang = document.getElementById('vjb-set-lang').value;
             settings.themeColor = document.getElementById('vjb-set-theme').value;
             settings.fontCode = document.getElementById('vjb-set-font-code').value;
             settings.customFontCode = document.getElementById('vjb-set-custom-code').value.trim();
@@ -837,6 +1273,61 @@
             saveSettings();
             toggleSettingsPanel();
         };
+
+        document.getElementById('vjb-export-btn').onclick = async () => {
+            const dataToExport = { settings: settings, bgData: null };
+            const downloadJSON = (data) => {
+                const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'VJudgeBetter_Settings.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+            try {
+                const bg = await localDB.get('vjb_bgData');
+                if (bg) {
+                    if (bg instanceof Blob) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => { dataToExport.bgData = reader.result; downloadJSON(dataToExport); };
+                        reader.readAsDataURL(bg);
+                        return;
+                    } else { dataToExport.bgData = bg; }
+                }
+                downloadJSON(dataToExport);
+            } catch (e) { console.error("Export error", e); downloadJSON(dataToExport); }
+        };
+
+        document.getElementById('vjb-import-btn').onclick = () => document.getElementById('vjb-import-input').click();
+        document.getElementById('vjb-import-input').onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (data.settings) {
+                        Object.assign(settings, data.settings);
+                        GM_setValue('vjb_settings', settings);
+                    }
+                    if (data.bgData) {
+                        if (typeof data.bgData === 'string' && data.bgData.startsWith('data:')) {
+                            const fetchRes = await fetch(data.bgData);
+                            const blob = await fetchRes.blob();
+                            await localDB.set('vjb_bgData', blob);
+                        } else { await localDB.set('vjb_bgData', data.bgData); }
+                    } else {
+                        const db = await localDB.init();
+                        const tx = db.transaction('bgStore', 'readwrite');
+                        tx.objectStore('bgStore').delete('vjb_bgData');
+                    }
+                    alert("Import successful! Reloading page...");
+                    location.reload();
+                } catch (err) { alert("Import failed: " + err); }
+            };
+            reader.readAsText(file);
+        };
     }
 
     function toggleSettingsPanel() {
@@ -846,6 +1337,7 @@
 
         if (panel.classList.contains('active')) {
             selectedFileData = currentBgData;
+            document.getElementById('vjb-set-lang').value = settings.lang || 'auto';
             document.getElementById('vjb-set-theme').value = settings.themeColor;
             document.getElementById('vjb-set-font-code').value = settings.fontCode;
             document.getElementById('vjb-set-custom-code').value = settings.customFontCode || '';
@@ -861,7 +1353,7 @@
             const infoEl = document.getElementById('vjb-file-info');
             if (currentBgData) {
                 textEl.style.display = 'none'; infoEl.style.display = 'block';
-                infoEl.innerHTML = currentBgData instanceof Blob ? `✓ 已托管本地大文件背景` : `✓ 已连接外部背景`;
+                infoEl.innerHTML = currentBgData instanceof Blob ? t('localBgHosted') : t('externalBgConnected');
             } else {
                 textEl.style.display = 'block'; infoEl.style.display = 'none';
             }
@@ -915,18 +1407,19 @@
         if (!descPanel) return;
 
         // 1. 添加公告标题
-        if (!descPanel.querySelector('.vjb-contest-overview-title')) {
-            const titleEl = document.createElement('h4');
+        let titleEl = descPanel.querySelector('.vjb-contest-overview-title');
+        if (!titleEl) {
+            titleEl = document.createElement('h4');
             titleEl.className = 'vjb-contest-overview-title';
-            titleEl.textContent = '公告';
             descPanel.prepend(titleEl);
         }
+        titleEl.textContent = t('announcementTitle');
 
         // 2. 添加空白占位符
-        if (!descPanel.querySelector('.vjb-empty-description-placeholder')) {
-            const placeholderEl = document.createElement('div');
+        let placeholderEl = descPanel.querySelector('.vjb-empty-description-placeholder');
+        if (!placeholderEl) {
+            placeholderEl = document.createElement('div');
             placeholderEl.className = 'vjb-empty-description-placeholder';
-            placeholderEl.textContent = '这里什么都没有……';
             const adEl = document.getElementById('contest-description-ad');
             if (adEl) {
                 descPanel.insertBefore(placeholderEl, adEl);
@@ -934,6 +1427,7 @@
                 descPanel.appendChild(placeholderEl);
             }
         }
+        placeholderEl.textContent = t('emptyDescPlaceholder');
     }
 
     // ================= 初始化入口 =================
@@ -958,9 +1452,13 @@
             if (e.altKey && (e.key === 's' || e.key === 'S')) { e.preventDefault(); toggleSettingsPanel(); }
         });
 
+        let statusDebounceTimer = null;
         const statusObserver = new MutationObserver(() => {
-            processStatusTextElements();
-            initContestOverview();
+            if (statusDebounceTimer) clearTimeout(statusDebounceTimer);
+            statusDebounceTimer = setTimeout(() => {
+                processStatusTextElements();
+                initContestOverview();
+            }, 100);
         });
         statusObserver.observe(document.body, { childList: true, subtree: true });
         processStatusTextElements();
